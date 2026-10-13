@@ -1,0 +1,2613 @@
+     The Syndrome Decoding in the Head
+     (SD-in-the-Head) Signature Scheme
+
+     Algorithm Specifications and Supporting
+          Documentation – Version 3.0
+
+    Carlos Aguilar Melchor        Slim Bettaieb        Loı̈c Bidoux
+    Thibauld Feneuil         Philippe Gaborit        Nicolas Gama
+Shay Gueron     James Howe         Andreas Hülsing       David Joseph
+    Antoine Joux       Mukul Kulkarni           Edoardo Persichetti
+ Tovohery H. Randrianarisoa        Matthieu Rivain        Dongze Yue
+
+                         August 31, 2026
+
+
+                             CISPA
+                         CryptoExperts
+               Eindhoven University of Technology
+                   Florida Atlantic University
+                              Meta
+                          SandboxAQ
+                      Sapienza University
+                 Technology Innovation Institute
+                       University of Haifa
+                     University of Limoges
+Contents
+1 Introduction                                                                                     2
+
+2 High-level description                                                                           3
+  2.1 VOLEitH in the PIOP formalism . . . . . . . . . . . . . . . . . . . . . . . . . . .          3
+  2.2 Overview of SD-in-the-Head . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       7
+
+3 Detailed algorithmic description                                                                 11
+  3.1 Main algorithms . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      11
+      3.1.1 Key generation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       11
+      3.1.2 Signing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      12
+      3.1.3 Verification . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     13
+  3.2 Subroutines . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    15
+      3.2.1 Symmetric cryptography primitives . . . . . . . . . . . . . . . . . . . . . .          15
+      3.2.2 Pseudo-randomness generation . . . . . . . . . . . . . . . . . . . . . . . .           17
+      3.2.3 Hashing and commitments . . . . . . . . . . . . . . . . . . . . . . . . . .            21
+      3.2.4 All-but-one vector commitments . . . . . . . . . . . . . . . . . . . . . . .           22
+      3.2.5 Batch line commitment . . . . . . . . . . . . . . . . . . . . . . . . . . . .          25
+      3.2.6 PIOP protocol . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        31
+
+4 Parameters and performances                                                                      38
+  4.1 Selection of parameters . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      38
+  4.2 Keys and signature sizes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     39
+  4.3 Selected parameters . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      40
+  4.4 Benchmarks . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     40
+
+5 Security                                                                                         42
+  5.1 SD to RSD security reduction . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       42
+  5.2 Attacks against the SD problem . . . . . . . . . . . . . . . . . . . . . . . . . . . .       43
+  5.3 Unforgeability . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   44
+
+6 Variants                                                                                         45
+  6.1 The F256 variant . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     45
+  6.2 The TCitH variant . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      46
+  6.3 The simple variant . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     47
+
+7 Advantages and limitations                                                                  49
+  7.1 Advantages of SD-in-the-Head . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+  7.2 Limitations of SD-in-the-Head . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                            1
+
+
+Changelog
+2026-08-31: Version 2.0 → Version 3.0
+We have fixed the inconsistencies between the specification and the reference implementations
+identified by [HHH+ 26]. We have also addressed the lack of salt in the leaf-seed expansion
+identified by [Del26]. In addition, we have shortened the secret key by removing the unused
+underlying seed and reduced the signature size by removing the redundant coefficient α1 .
+  We have updated the proof-system parameters to achieve better trade-offs between running
+time and signature size. The syndrome-decoding parameters remain unchanged.
+  We have added instances based on AES-based grinding, in addition to the existing instances
+based on hash-based grinding. We also introduce a new variant in the corresponding section,
+designed to favor simplicity and constant signing time at the cost of larger signatures.
+  We became aware of the preprint [GZL+ 26], which claims to improve SDitH signature sizes
+by optimizing the modeling of the syndrome decoding problem. Since the preprint was released
+only ten days before the Round-3 submission deadline, the team did not have sufficient time to
+evaluate these results and assess their implications. We plan to investigate this work in greater
+detail in the coming months.
+
+2025-02-05: Version 1.1 → Version 2.0
+We have updated the SDitH signature scheme to align it with the current literature. The first
+version of the scheme utilized the MPCitH framework using linear multiparty computation,
+optimized through hypercube [AGH+ 23] and threshold approaches [FR23b]. In the second
+version, we have adopted the VOLEitH framework [BBD+ 23], which allows us to reduce the
+signature size by more than half.
+  Additionally, we have modified the syndrome decoding field. Previously, we focused on F256
+and F251 ; now, we are using the binary field F2 , which offers a more conservative security
+assumption.
+  Finally, we have redesigned the seed trees to incorporate AES-128 and Rijndael-256-256 as
+symmetric primitives, moving away from Keccak-based hashes to enhance the speed of the
+scheme.
+2                    The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+1 Introduction
+This specification presents the Syndrome-Decoding-in-the-Head (SD-in-the-Head) digital signa-
+ture scheme. The scheme is based on the hardness of the syndrome decoding (SD) problem
+for random linear codes on a finite field. It consists in a zero-knowledge proof of knowledge
+of a low-weight vector x solution of a syndrome decoding instance y = Hx, which is made
+non-interactive using the Fiat-Shamir transform. This zero-knowledge proof relies on the prin-
+ciple of “multiparty computation in the head” (MPCitH) originally introduced in [IKO+ 07]
+and notably used by the Picnic signature scheme [ZCD+ 20], candidate to the previous NIST
+call for post-quantum algorithms. The first version of SD-in-the-Head was based on the initial
+scheme published in [FJR22] with further improvements from [AGH+ 22; FR22]. The second
+version relies on a different proof system. This proof system is based on the VOLE-in-the-Head
+framework [BBD+ 23] and its efficient application to the SD problem [OTX24; BBG+ 24]. The
+third version retains the same proof system and overall design as the second version, with only
+minor patches and parameter updates providing new performance trade-offs.
+  For most applications of signatures, specially the ones that require certificates such as TLS,
+the “public key + signature size” is thus a critical metric. The SD-in-the-Head signature scheme
+presented in this specification achieves 3.7 KB for this metric in Category I, which is similar to
+ML-DSA and less than halved compared to SLH-DSA (7.8 KB).
+
+Organization of this specification
+Section 2 gives a high-level description of the SD-in-the-Head-3 scheme. Section 3 provides a de-
+tailed description of the key generation, signature and verification algorithms. This description
+intends to allow a non-ambiguous implementation of the scheme. The selection of the parame-
+ters is explained in Section 4 which also exhibits our proposed instances for the three considered
+security levels. Section 4.4 provides performance figures for our different instances. The secu-
+rity of the SD-in-the-Head signature scheme is analyzed in Section 5 while Section 5.2 further
+evaluates the complexity of known attacks. We finally list some advantages and limitations of
+the scheme in Section 7.
+
+    We welcome enquiries, comments, and corrections at
+
+                                     consortium@sdith.org
+
+
+  Implementations and material related to the SD-in-the-Head signature scheme will be uploaded
+and maintained on:
+
+                                  https://github.com/sdith
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                            3
+
+
+2 High-level description
+The third version of the SD-in-the-Head signature scheme, namely SD-in-the-Head-3, relies on the
+VOLE-in-the-Head framework [BBD+ 23] to build a 7-round zero-knowledge proof of knowledge
+for the syndrome decoding problem, which is then transformed into a signature scheme using
+the Fiat-Shamir heuristic [FS87]. The modeling used to handle the syndrome decoding problem
+in the VOLEitH framework has been proposed independently into the two articles [OTX24]
+and [BBG+ 24].
+  The following sections present the VOLE-in-the-Head framework using the PIOP formalism
+and describe how SD-in-the-Head-3 is built from this framework and the modeling of [OTX24;
+BBG+ 24].
+
+2.1 VOLEitH in the PIOP formalism
+The MPCitH paradigm [IKO+ 07] is a versatile method introduced in 2007 to build zero-
+knowledge proof systems using techniques from secure multi-party computation (MPC). This
+paradigm has been drastically improved in recent years and is particularly efficient to build
+zero-knowledge proofs for small circuits such as those involved in (post-quantum) signature
+schemes. The more recent MPCitH-based frameworks are the VOLE-in-the-Head (VOLEitH)
+framework from [BBD+ 23] and the Threshold-Computation-in-the-Head (TCitH) framework
+from [FR23b; FR23a].
+   In this subsection, we will describe the general proof system which SD-in-the-Head-3 relies
+on. In what follows, we present this proof system using the formalism of the Polynomial Inter-
+active Oracle Proofs (PIOP), as presented in [Fen24]. Indeed, while the TCitH and VOLEitH
+frameworks were originally introduced using sharing-based and VOLE-based formalisms, respec-
+tively, we present them within the PIOP formalism, which provides a unified and comprehensive
+ground for these techniques.1
+   Let us assume that we want to build an interactive zero-knowledge proof with a prover
+convincing a verifier that they know a witness w ∈ Fn2 which satisfies some public polynomial
+relations:
+                                    fj (w) = 0, ∀1 ≤ j ≤ m
+where f1 , . . . , fm are polynomials over F2 of total degree at most d. Let us consider a public
+subset S ⊂ F2λ . The proof system we consider is the following:
+
+      1. For 1 ≤ j ≤ n, the prover samples a random degree-1 polynomials Pj such that Pj (0) = wj .
+         They also sample a random degree-(d − 1) polynomial P0 ∈ F2λ [X]. They commit to those
+         polynomials.
+
+      2. The verifier chooses random coefficients γ1 , . . . , γm from F2λ and sends them to the prover.
+         The latter then reveals the degree-d polynomial Pα (X) defined such that
+                                                        m
+                                                        X
+                              Pα (X) = P0 (X) · X +           γj · fj (P1 (X), . . . , Pn (X)) .             (1)
+                                                        j=1
+
+
+ 1
+     In the TCitH framework, instead of performing operations over Shamir’s secret sharings, we can directly work
+      over their underlying polynomials. In the VOLEitH framework, instead of performing operations over VOLE
+      gadgets, we can directly work over their underlying degree-1 polynomials.
+4                     The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+    3. The verifier samples a random evaluation point ∆ from the public set S ⊂ F2λ and sends
+       it to the prover. The latter then reveals the evaluations vi := Pi (∆), together with a proof
+       π that the evaluations are consistent with the commitment.
+
+    4. The verifier checks that the revealed evaluations are consistent with the commitment using
+       π and checks that we have
+                            (
+                             Pα (0) = 0 ,
+                                                                                              (2)
+                             Pα (∆) · ∆ = v0 · ∆ + m
+                                                   P
+                                                      j=1 γj · fj (v1 , . . . , vn ) .
+
+
+The above protocol assumes that the prover has a way to commit polynomials and to provably
+open some evaluations later (while keeping hidden the other evaluations).
+
+Security analysis. We can observe that the coefficient in front of the degree-0 monomial (i.e.
+the constant term) in the right term of Equation (1) is
+                                      m
+                                      X
+                                            γj · fj (w1 , . . . , wn ) ,                           (3)
+                                      j=1
+
+so the constant term Pα (0) of the polynomial Pα is indeed zero because this quantity is zero
+when the witness w is valid. Let us assume that the prover is malicious, meaning that they do
+not know a valid witness. It implies that there exists j ∗ such that fj ∗ (w) ̸= 0. In that case, the
+probability that there exists some Pα with Pα (0) = 0 such that Equation (1) holds is at most
+1/2λ over the randomness of γ1 , . . . , γm , because the coefficient (3) is zero only with probability
+1/2λ . If Equation (1) does not hold, the probability that the check in Equation (2) passes is at
+most d/|S|, since the degree-d polynomial relation
+                                                                              
+                                         m
+                                                  [h]
+                                        X
+                    Pα (X) − P0 +          γj · fj (X, P1 (X), . . . , Pm (X)) ̸= 0
+                                      j=1
+
+
+would have at most d roots (and so the random challenge ∆ should   d be among those roots). So,
+the proof system is sound, with a soundness error of 21λ + 1 − 21λ · |S| . Moreover, assuming that
+the commitment scheme is hiding, we can observe that the interactive proof is zero-knowledge
+since
+
+    • revealing Pα (X) leaks no information about the secret thanks to the random polynomial
+      P0 , and
+
+    • revealing one evaluation of the polynomials P1 , . . . , Pn leaks no information about the
+      leading term thanks to the randomness used to build those polynomials.
+
+  In what follows, we describe how to commit polynomials such that we can later open some
+evaluations.
+
+The TCitH-GGM approach. Thanks to ideas from [ISN89; CDI05], the TCitH framework [FR23a]
+shows that we can commit n̄ random polynomials using seed trees in such a way that the com-
+mitter can later open one evaluation among a set of N while keeping the others hidden. Here
+is the commitment process for degree-1 polynomials:
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                                  5
+
+
+   1. One uses an all-but-one vector commitment (AVC) to sample and commit N seeds seed1 , . . . , seedN .
+
+   2. One expands each seedi as wrnd,i := PRG(seedi ) ∈ Fn̄q for i ∈ {1, . . . , N }, where PRG is a
+      pseudorandom generator.
+
+   3. One computes
+                                                        N
+                                                        X
+                                               wacc ←           wrnd,i ∈ Fn̄2
+                                                        i=1
+                                                          XN
+                                              wbase ← −           ϕ(i) · wrnd,i ∈ Fn̄2κ
+                                                           i=1
+
+      where ϕ : {1, . . . , N } → F2κ is a public one-to-one function.
+
+   4. One defines Pj as
+                                              Pj (X) = (wacc )j · X + (wbase )j
+      for all j.
+
+This commitment procedure has the main advantage to enable the prover to reveal one evalua-
+tion {Pj (ϕ(i∗ ))}j for i∗ ∈ [1 : N ] while keeping secret the coefficients wacc and wbase : they just
+need to reveal all the {seedi }i except seedi∗ (by opening the AVC scheme) and the verifier will
+be able to compute Pj (ϕ(i∗ )) as
+                     N
+                     X
+                                 (ϕ(i∗ ) − ϕ(i)) · (wrnd,i )j        with       wrnd,i := PRG(seedi ).
+                   i=1,i̸=i∗
+
+Indeed, we have that
+               N
+               X                                                      N
+                                                                      X                    N
+                                                                                           X
+                             ∗                                   ∗
+                         (ϕ(i ) − ϕ(i)) · (wrnd,i )j = ϕ(i ) ·              (wrnd,i )j −         ϕ(i) · (wrnd,i )j
+             i=1,i̸=i∗                                                i=1                  i=1
+
+                                                        = ϕ(i∗ ) · (wacc )j + (wbase )j = Pj (ϕ(i∗ )).
+
+  We can use this commitment procedure to commit to the polynomials in Step 1 of the proof
+system. We just need to rely on auxiliary values to enforce some coefficients of Pj . Because the
+public set would be of size N (S := {ϕ(1), . . . , ϕ(N )}), the resulting 5-round zero-knowledge
+proof system has a soundness error of
+                                                    
+                                     1             1     d
+                                      λ
+                                        + 1− λ ·            ,
+                                    2              2     N
+
+and one needs to rely on protocol repetitions to achieve the desired security. Indeed, the
+computational complexity is linear in N and so we can not take N exponentially large. To have
+a λ-bit security we need to repeat the protocol τ times in parallel, such that (d/N )τ ≤ 2−λ .
+6                         The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+The VOLEitH approach. In the VOLEitH framework, the commitment scheme enables the
+opening of an evaluation from an exponentially-large set S, thus avoiding parallel repetitions
+of the PIOP. As the TCitH framework, the VOLEitH approach starts by committing τ sets of
+                  (1)           (τ )
+polynomials {Pi }i , . . . , {Pi }i in parallel (exactly using the same commitment procedure).
+However, instead of considering those sets of polynomials individually as in the TCitH frame-
+work, the VOLEitH approach consists in “merging them” into a polynomial over an extension
+field of size greater that N τ .
+   This merge works as follows. Consider τ polynomials P (1) , . . . , P (τ ) encoding a witness coef-
+                                                   (e)                          (e)
+ficient in their leading terms: P (e) = w · X + wbase , where w ∈ F2 and wbase ∈ F2κ for every e.
+These can be merged into the polynomial:
+                                                                  (1)           (τ )
+                                      P (X) = w · X + ψ(wbase , . . . , wbase )
+                                                      |        {z            }
+                                                                        ∈F2λ
+
+where τ · κ ≤ λ and ψ is an F2 -morphism from (F2κ )τ to F2λ . The key observation is that we
+can open an evaluation P (X) into any point of
+
+                E := ψ(v1 , . . . , vτ ) | (v1 , . . . , vτ ) ∈ {ϕ(1), . . . , ϕ(N )}τ ⊂ F2λ
+                     
+
+
+by opening evaluations of P (1) , .. . , P (τ ) on the small domain. Specifically, we compute P (∆)
+where ∆ = ψ ϕ(i(1) ), . . . , ϕ(i(τ ) ) for some (i(1) , . . . , i(τ ) ) ∈ {1, . . . , N }τ as
+
+                                  ψ P (1) (ϕ(i(1) )), . . . , P (τ ) (ϕ(i(τ ) )) .
+                                                                                
+
+Indeed, we have
+                                                                               (1)                          (τ ) 
+      ψ P (1) (ϕ(i(1) )), . . . , P (τ ) (ϕ(i(τ ) )) = ψ w · ϕ(i(1) ) + wbase , . . . , w · ϕ(i(τ ) ) + wbase
+                                                    
+
+                                                                                                (1)             (τ ) 
+                                                      = w · ψ ϕ(i(1) ), . . . , ϕ(i(τ ) ) + ψ wbase , . . . , wbase
+                                                                                         
+
+                                                                      (1)              (τ ) 
+                                                      = w · ∆ + ψ wbase , . . . , wbase = P (∆) .
+
+So, instead of running the proof system τ times in parallel over the polynomials P (1) , . . . , P (τ ) ,
+one runs it once over the polynomial P . Since the evaluation set S is now of size N τ , the
+resulting soundness error is thus
+                                                 
+                                     1          1     d
+                                       λ
+                                         + 1− λ · τ .
+                                     2         2     N
+
+   Let us remark that the merge requires the polynomials P (1) , . . . , P (τ ) to have the same leading
+term. Therefore, the prover should convince the verifier that those τ polynomials have the same
+leading term. Let us assume that we work with vector polynomials, i.e. P (e) is of the form
+                 (e)                         (e)
+P (e) = w · X + wbase for some w ∈ Fn̄2 and wbase ∈ Fn̄2λ . To convince the verifier, the prover will
+run the following consistency check. After committing to the τ polynomials, the prover gets a
+                        (λ+B)×n̄
+random matrix M ∈ F2             from the verifier and then reveals the polynomial
+
+                                             R(e) (X) ← M · P (e) (X)
+
+for all e ∈ {1, . . . , τ }. The verifier can then check that the leading terms of R(1) (X), . . . , R(τ ) (X)
+are indeed the same, and, after the opening of the evaluations, they can check that
+
+                                        R(e) (ϕ(i(e) )) = M · P (e) (ϕ(i(e) ))
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                    7
+
+
+for all e.
+   The probability that there exists e1 and e2 such that the leading terms of R(e1 ) (X)         and
+R 2 ) (X) are the same, while those of P (e1 ) (X) and P (e2 ) (X) are different is at most  τ2 · εcheck
+  (e
+
+where εcheck := maxv̸=u PrM ←$ [M v = M u]. The parameter B is chosen such that τ2 · εcheck ≤
+2−λ . Let us note that this check leaks information about the leading term w. To prevent leakage
+about secret values, the λ + B last coefficients of w can be chosen at random and M can be
+defined in the form M = [M ′ | Iλ+B ]. Because of this consistency check which relies on a
+random challenge from the verifier, the resulting zero-knowledge protocol has 7 rounds.
+
+Witness as constant term. In the proof system described at the beginning of this section, we
+use some polynomials P1 , . . . , Pn such that Pj (0) = wj for all j, meaning the witness is encoded
+as the constant term of those polynomials. On the other hand, the VOLEitH commitment
+procedure merges those polynomials assuming that the witness is encoded as their leading term.
+In its original description, the TCitH framework relies on the former encoding (as for original
+Shamir’s secret sharing) but it can easily support the latter encoding. On the other hand, the
+VOLEitH approach is constrained to use the leading-term encoding because ψ is F2 -linear and
+so the merging strategy requires that the leading term lives in F2 (and not in F2λ ).
+   One advantage of the constant-term encoding is to be less expensive in terms of field multi-
+plications. Because of the relative heaviness of the considered modelling for SD-in-the-Head-3
+we propose the following tweak to support VOLEitH merging procedure while still encoding the
+witness in the constant term. We use the VOLEitH approach to commit to P̂ (X) := X ·P (1/X).
+If the witness is encoded as the constant term of P , then it is encoded as the leading term of P̂ .
+To open the evaluation P (∆), the prover simply opens the evaluation P̂ (∆inv ) with ∆inv := ∆−1 ,
+which allows the verifier to retrieve P (∆) as P (∆) = ∆ · P̂ (∆inv ).
+
+2.2 Overview of SD-in-the-Head
+The SD-in-the-Head-3 scheme relies on the proof system described in Section 2.1, using the
+VOLE-in-the-Head approach, which enables proving knowledge of a witness satisfying a set of
+degree-d polynomial constraints. In what follows, we explain how we express a syndrome de-
+coding instance as such a system of degree-d constraints, in a way that aims for small witness
+size (and hence small signature size). We then describe the optimlized all-but-one vector com-
+mitment our scheme relies on. We finally address the transformation of the obtained 7-round
+interactive proof into a signature scheme using the standard Fiat-Shamir transformation.
+
+SD modeling. We need to express a syndrome decoding instance as a system of degree-d
+constraints. To proceed, we will rely on the syndrome decoding modeling proposed by [OTX24;
+BBG+ 24]. The high-level idea is to consider a structured syndrome decoding problem, more
+precisely the regular syndrome decoding problem (RSD). However, as suggested in [BBG+ 24],
+we use RSD parameters for which we have a provable security reduction to a secure unstructured
+syndrome decoding instance, using the reduction from [FJR22]. Therefore, the security of SD-in-
+the-Head-3 still inherits from the conservative security of the oldest hard problem of code-based
+cryptography, namely the syndrome decoding problem for (unstructured) random linear codes.
+
+                            (n−k)×n
+   Given a matrix H ∈ F2           and a syndrome vector y ∈ F2n−k , the RSD problem consists
+in finding a vector x ∈ Fn2 such that
+
+   • x satisfies the linear relation y = Hx, and
+8                      The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+    • x is regular, meaning that it is the concatenation of w elementary vectors e1 , . . . , ew of
+           n                   n
+      size w (i.e. vector with w − 1 coefficients 0 and one coefficient 1).
+To express an RSD instance as a contraint system, [OTX24; BBG+ 24] proposes to rely on a
+compression version of x := (e1 ∥ . . . ∥ ew ): their idea consists in deriving each vector ei as a
+                        n
+tensor product of log2 w    elementary vectors of size 2:
+                               !              !                              !
+                        bi,1             bi,2                bi,log2 (n/w)
+               ei ←              ⊗               ⊗ ... ⊗                       ∈ Fn/w ,
+                      1 − bi,1       1 − bi,2              1 − bi,log2 (n/w)
+where bi,1 , . . . , bi,log2 (n/w) is the binary decomposition of the non-zero positions of ei . In that
+case, the j th coordinate of ei is derived as
+                                               log2 (n/w)
+                                                  Y
+                                    (ei )j ←                (bi,k ⊕ bitk (j)) ,
+                                                 k=1
+
+where bitk (j) is the k th bit of the integer j and       · is the negation function. By doing this, we do
+not need to check that the ei ’s are elementary since this property is guarantee by design (i.e. a
+vector ei satisfying the above equation is always an elementary vector, whatever              are the values
+                                                                                   n
+                                                                                     
+bi,1 , . . . , bi,log2 (n/w) ). This construction leads to a witness  of w · log 2 w   bits which is verified
+                                                                  n
+                                                                    
+using a system of degree-d constraints, with d = log2 w . We thus obtain a small witness, but
+constraints of relatively high degree. We can relax [OTX24; BBG+ 24]’s idea with the following
+tweak. We build each elementary vector ei as a tensor product of d elementary vectors of size
+µ1 , . . . , µd (with µ1 · µ2 · . . . · µd = n/w). We obtain a witness of bit-size
+                                                d
+                                                X
+                                                       (µi − 1) ,
+                                                 i=1
+
+and a system of degree-d constraints. By taking µi a bit larger than 2 (for example, 4), we
+only slightly increase the witness size, but significantly we reduce the constraints’ degree. On
+the other hand, by using elementary vectors of size µi > 2, we need to add further (degree-2)
+constraints to prove that the ei ’s are elementary vectors.
+  Specifically, the signer shall prove that they know bits {bi,j,k }1≤i≤w,1≤j≤d,1≤k≤µj −1 such that
+    • we have y = Hx with x := (e1 ∥ . . . ∥ ew ), where ei is defined as
+                                                                             
+                      bi,1,1                 bi,2,1                     bi,d,1
+                  
+                     bi,1,2     
+                                           bi,2,2   
+                                                      
+                                                                   
+                                                                       bi,d,2    
+                                                                                  
+                        ..                   ..                       ..      ∈ Fn/w
+                                                                                  
+             ei ← 
+                         .      ⊗
+                                 
+                                                .    
+                                                       ⊗  . . . ⊗ 
+                                                                           .     
+                                                                             
+                   bi,1,µ1 −1   bi,2,µ2 −1                      bi,d,µd −1 
+                      P                      P                          P
+                   1 − k bi,1,k        1 − k bi,2,k                  1 − k bi,d,k
+      for all 1 ≤ i ≤ w;
+    • for all pairs (i, j), (bi,j,1 , . . . , bi,j,µ1 ) has at most one non-zero coordinate, implying that
+                                                                      
+                                                               bi,j,1
+                                                         
+                                                              bi,j,2  
+                                                                       
+                                                                ..    
+                                                         
+                                                                 .    
+                                                                       
+                                                                      
+                                                          bi,j,µj −1 
+                                                               P
+                                                          1 − k bi,j,k
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                   9
+
+
+      is an elementary vector.
+
+AVC Optimizations. As explained in Section 2.1, the proof system starts by committing in-
+dependently to τ vector polynomials P (1) , . . . , P (τ ) . It implies that we use τ all-but-one vector
+commitments, where each of them uses of GGM tree of N leaves. Therefore, we can optimize
+those all-but-one vector commitments by using a so-called batched all-but-one vector commit-
+ment (BAVC) scheme, which aims to be more efficient than τ independent AVC schemes. In
+SD-in-the-Head-3, we use the “one-tree” BAVC scheme described in [BBM+ 24]. Instead of con-
+sidering τ independent GGM trees of N leaves in parallel, this scheme relies on a unique large
+GGM tree of τ · N leaves where the ith seed of the eth parallel repetition is associated to the
+(e · N + i)th leaf of the large GGM tree. As explained in [BBM+ 24], “opening all but τ leaves
+of the big tree is more efficient than opening all but one leaf in each of the τ smaller trees,
+because with high probability some of the active paths in the tree will merge relatively close to
+the leaves, which reduces the number of internal nodes that need to be revealed.” Moreover, the
+authors of [BBM+ 24] suggest improving the previous approach by rejecting certain bad chal-
+lenges for which the paths did not sufficiently merged. When the BAVC opening is such that
+the number of revealed nodes in the sibling paths exceeds a fixed threshold Topen , the opening
+is considered as a failure (i.e. it returns ⊥), forcing the prover/signer to recompute another
+opening challenge by re-hashing with an incremented counter. This process is done until the
+number of revealed nodes is less than Topen . For example, if we consider N = 256 and τ = 16,
+the number of revealed nodes is smaller than (or equal to) Topen := 110 with probability ≈ 0.2
+(which is to be compared to τ · log2 (N ) = 128 nodes for the sibling paths of separated trees).
+The selected value of Topen induces a rejection probability prej = 1 − 1/θ, for some θ ∈ (0, ∞),
+hence the signer needs to perform an average of θ hash computations for the opening challenge
+(instead of 1). While this strategy decreases the challenge space by a factor θ, it does not
+change the average number of hashes that must be computed in a forgery attempt against the
+signature scheme (since the latter is multiplied by θ). As noticed by the authors of [BBM+ 24],
+this strategy can be thought of as loosing log2 θ bit of security (because of a smaller challenge
+space) which are regained thanks to the implicit proof-of-work for finding a good challenge.
+
+Fiat-Shamir transformation & grinding. To obtain the SD-in-the-Head-3 signature scheme
+from the SD-in-the-Head-3 zero-knowledge proof of knowledge, we rely on the Fiat-Shamir trans-
+formation [FS87] to remove the prover-verifier interactions. We further proceed with adding a
+random salt to enforce domain separation between signatures (and avoid seed collision issues).
+Each verifier challenge is computed as the output of an extendable-output function (XOF) which
+takes as input the data that the prover would send before receiving that challenge in an inter-
+active protocol. The SD-in-the-Head-3 protocol is a 7-round proof system, so there are three
+challenges: the random matrix M of the consistency check, the random coefficients γ1 , . . . , γm
+to batch the polynomial constraints, and the evaluation point ∆ for the opened evaluations. In
+SD-in-the-Head-3 scheme, we use a grinding proof-of-work in the Fiat-Shamir hash computation
+of the last challenge, as proposed in [BBM+ 24]. Together with the opening challenge, the signer
+samples a wpow -bit value vpow and keeps the opening challenge only if this additional value is
+zero, with wpow a parameter of the scheme. If this additional value is non-zero, then the signer
+increments a counter and recompute another opening challenge with another wpow -bit value.
+This process is repeated until obtaining a grinding value equal to zero. Let us remark that we
+can use the same counter for this grinding process and the rejection process due to the fact that
+the [BBM+ 24]’s BAVC scheme might return ⊥ when the number of revealed nodes is larger
+than the chosen threshold Topen . This grinding tweak increases the cost of hashing the last
+10                   The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+challenge by a factor 2wpow and hence increases the soundness security of wpow bits. As a result,
+we can take smaller parameters (N, τ ) for the large tree, namely parameters achieving λ − wpow
+bits of security instead of λ. More precisely, the parameters N , τ and wpow must be chosen
+such that (d/N τ ) · 2−wpow ≤ 2−λ to achieve a λ-bit security. While our main instances rely on
+hash-based grinding, we also provide alternative instances based on the cipher-based grinding
+technique proposed by [Riv26].
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                  11
+
+
+3 Detailed algorithmic description
+3.1 Main algorithms
+3.1.1 Key generation
+The key generation consists in sampling a regular syndrome decoding instance. The public
+key is the instance (H, y) while the secret key is composed of the instance and the associated
+solution (H, y, x). Moreover, we consider that H is in standard form, i.e. H := (H ′ | In−k ).
+  We describe in Algorithm 1 the subroutine ExpandWitness which expands a λ-bit seed into a
+regular syndrome decoding solution x and builds the SD-in-the-Head-3 witness wit, where wit
+encodes the positions of the non-zero coefficients. To proceed, we first sample the position of
+the non-zero coefficients in each solution chunk of size m (Line 2) from which we derive the
+regular SD solution x. Then we build the witness by encoding the positions. As explained in
+Section 2.2, we write each chunk as the tensor product of d elementary vectors of size µ1 , . . . , µd .
+We omit the last coordinate of all the subvectors (Line 11), since it can be deduced from the
+others.
+
+Algorithm 1 ExpandWitness
+Input: a seed seed
+      ▷ Expand the RSD solution
+ 1: prg ← PRG.Init(seed)
+ 2: pos ← SampleIntegers(prg, {0, . . . , m − 1}, w)                        ▷ pos ∈ {0, . . . , m − 1}w
+ 3: for i from 0 to w − 1 do
+ 4:    chunk[i] := ElementaryVector(m, pos[i])
+ 5: x ← (chunk[0] ∥ . . . ∥ chunk[w − 1])                                                    ▷ x ∈ Fnq
+
+      ▷ Build the witness
+ 6: wit ← ∅
+ 7: for i from 0 to w − 1 do
+ 8:      for j from 0 to d − 1 do
+ 9:         (pos[i], p) ← (pos[i] // µj , pos[i] % µj )
+10:         e := (e0 , . . . , eµj −1 ) ← ElementaryVector(µj , p)
+11:         wit ← wit ∥ (e0 , . . . , eµj −2 )
+
+12: return (x, wit)
+
+
+   The key generation is described in Algorithm 2. It first samples two seeds seedsk and seedpk .
+The first seed seedsk is used to expand the syndrome decoding solution x and the SD-in-the-Head
+witness wit through the subroutine ExpandWitness. The second seed seedpk is used to generate
+the matrix H ′ which defines the parity check matrix H := (H ′ | In−k ). The algorithm then
+builds the public key by packing the seed seedpk which encodes H and the vector y := Hx.
+It also builds the secret key by packing the seed seedpk , the vector y and the SD-in-the-Head-3
+witness wit.
+12                        The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+Algorithm 2 SD-in-the-Head-3 – Key Generation
+ 1: seedsk ← {0, 1}λ
+ 2: seedpk ← {0, 1}λ
+ 3: (x, wit) ← ExpandWitness(seedsk )                        ▷ x ∈ Fnq , |wit|2 = w · ((µ1 − 1) + . . . + (µd − 1))
+                                                                                                                 (n−k)×k
+ 4: H ′ ← ExpandH(seedpk )                                                                           ▷ H ′ ∈ Fq
+ 5: y = [In−k | H ′ ] · xA                                                                                 ▷ y ∈ Fn−k
+                                                                                                                  q
+ 6: pk = Serialize(seedpk , y)
+ 7: sk = Serialize(seedpk , y, wit)
+ 8: return (pk, sk)
+
+
+
+3.1.2 Signing
+The signing algorithm is described in Algorithm 3. After expanding the secret key as (H ′ , y, wit),
+it samples a λ-bit salt which provides domain separation between signatures and a λ-bit root
+seed from which all the pseudo-randomness of the scheme will be derived. Then, using the
+routine BLC.Commit, it commits to random degree-1 vector polynomials Pwit (X) ∈ (F2λ [X])|wit|
+and Prnd (X) ∈ (F2λ [X])(d−1)λ such that Pwit (0) = wit and Prnd (0) is uniformly sampled from
+  (d−1)λ
+F2       . While Pwit encodes the witness in the PIOP protocol, Prnd aims to prevent witness
+leakage in the protocol. The hash digest hlines is the BLC commitment to these polynomials.
+After the commitment phase, it runs the PIOP protocol using the routine PIOP.Prover.Run,
+namely it computes the degree-d polynomial Pα such that
+                                                       m
+                                                       X
+                         Pα (X) = P0 (X) · X +               γj · fj (P1 (X), . . . , P|wit| (X)).
+                                                       j=1
+
+where
+
+     • P1 , . . . , P|wit| are the witness polynomial, i.e. Pwit := P1 , . . . , P|wit| ;
+                                                                                       
+
+     • P0 is the degree-(d − 1) masking polynomial built as
+                                                                 
+                                        d−2 λ−1
+                                        X    X
+                              P0 (X) :=        δ j · Prnd,i,j (X) · X d−2−i
+                                                 i=0    j=0
+
+
+       with Prnd := (Prnd,0,0 , . . . , Prnd,0,λ−1 , . . . , Prnd,d−2,0 , . . . , Prnd,d−2,λ−1 ) and (1, δ, δ 2 . . .) is a
+       F2 -basis of F2λ ;
+
+    • {fj }j are the degree-d polynomial contraints that the SD-in-the-Head-3 witness wit should
+         satisfy (c.f. Section 2.2).
+
+By design, Pα satisfies Pα (0) = 0, so we can write Pα as di=1 αi · X i (i.e. without constant
+                                                            P
+term). Then, the signing algorithm hashes Pα (by hashing its coefficients), samples a random
+evaluation point ∆ ∈ F2λ and opens the polynomial evaluations Pwit (∆) and Prnd (∆) using
+the routine BLC.OpenRandomEvaluation. By “opening”, we mean that the signer provides an
+opening data pdecom that enables the verifier to recover pwit := Pwit (∆) and prnd := Prnd (∆).
+The verifier can then check that those evaluations are consistent with the BLC commitment
+hlines .
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                               13
+
+
+Algorithm 3 SD-in-the-Head-3 – Signing Algorithm
+Input: a secret key sk and a message msg ∈ {0, 1}∗
+    ▷ Phase 0: Initialization.
+                                                            |wit|
+ 1: (seedpk , y, wit) ← Deserialize(sk, {0, 1}λ , Fqn−k , F2        )
+                                                                                           (n−k)×k
+ 2: H ′ ← ExpandH(seedpk )                                                       ▷ H ′ ∈ Fq
+ 3: salt ← {0, 1}λ
+ 4: rseed ← {0, 1}λ
+
+    ▷ Phase 1: Build & Commit Witness/Masking Polynomials.
+ 5: (Pwit , Prnd , hlines , key, aux) ← BLC.Commit(salt, rseed, wit)              ▷ Pwit (0) = wit
+
+    ▷ Phase 2: PIOP Protocol (prover side).
+                                                                                           (≤d)
+ 6: Pα ← PIOP.Prover.Run(Pwit , Prnd , hlines , (H ′ , y))                     ▷ Pα (X) ∈ F2λ [X]
+                                                                        ▷ Pα (X) = 0<i≤d αi · X i
+                                                                                   P
+ 7: hpiop = Hashpiop (pk, hlines , α1 , . . . , αd , msg)
+
+    ▷ Phase 3: Open random evaluations.
+ 8: pdecom ← BLC.OpenRandomEvaluation(key, hpiop )
+ 9: σ = Serialize (salt ∥ hpiop ∥ aux ∥ pdecom ∥ (α2 , . . . , αd ))
+10: return σ
+
+
+3.1.3 Verification
+The verification algorithm is described in Algorithm 4. After expanding the public key as (H ′ , y)
+and parsing the signature, it recovers the evaluations pwit := Pwit (∆) and prnd := Prnd (∆) from
+pdecom as well as hhlines using the routine BLC.RecomputeEvaluation. If the recovered hhlines
+does not match the value of the signing algorithm, the later verification hpiop =h′piop will fail
+with overwhelming probability, since hhlines is input of the hash computation of h′piop . At the
+same time, BLC.RecomputeEvaluation outputs the random evaluation point ∆. The verification
+algorithm then deduces the evaluation pα = Pα (∆) using the routine PIOP.ComputeOutput and
+check that it is consistent with the polynomial Pα included in the signature. Finally, it checks
+that the polynomial Pα is the same as in the signing algorithm by comparing the hash digests.
+14                       The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+
+
+Algorithm 4 SD-in-the-Head-3 – Verification Algorithm
+Input: a public key pk, a signature σ and a message msg ∈ {0, 1}∗
+      ▷ Phase 0: Initialization.
+ 1: (salt ∥ hpiop ∥ aux ∥ pdecom ∥ (α2 , . . . , αd )) ← Deserialize(σ)
+ 2: (seedpk , y) ← Deserialize(pk)
+                                                                                               (n−k)×k
+ 3: H ′ ← ExpandH(seedpk )                                                            ▷ H ′ ∈ Fq
+
+      ▷ Phase 1: Recomputing Evaluation.
+ 4: (∆, pwit , prnd , hlines ) ← BLC.RecomputeEvaluation(aux, pdecom, salt, hpiop )
+ 5:                                                                 ▷ pwit := Pwit (∆), prnd := Prnd (∆)
+ 6: if ∆ = ⊥ then
+ 7:      return Reject
+
+      ▷ Phase 2: PIOP Protocol (verifier side).
+ 8: pα ← PIOP.Verifier.Run(∆,
+                             pwit, prnd , hlines , (H ′ , y))                        ▷ pα := Pα (∆)
+                                                                              ▷ Pα (X) = di=1 αi · X i
+                           Pd
+         = ∆−1 ·                     · ∆i
+                                                                                         P
+ 9: α1          pα − i=2 αi
+     ′
+10: hpiop = Hashpiop (pk, hlines , α1 , . . . , αd , msg)
+
+      ▷ Phase 3: Verification.
+11: if hpiop ̸= h′piop then
+12:      return Reject
+13: return Accept
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                             15
+
+
+3.2 Subroutines
+3.2.1 Symmetric cryptography primitives
+The SD-in-the-Head-3 signature scheme relies on three types of symmetric cryptographic prim-
+itives: a hash function (Hash), an extendable-output function (XOF), and a block cipher (Enc).
+Their concrete instantiations are summarized in Table 1.
+
+   Table 1: Symmetric cryptography primitives for NIST Security Categories I, III, and V.
+
+                Category I                   Category III                     Category V
+       Enc                             Rijndael-256-256 (full)
+                 AES-128                                                   Rijndael-256-256
+       Enc∗                         Rijndael-256-256 (truncated)
+       Hash     SHAKE-128                   SHAKE-256                        SHAKE-256
+       XOF      SHAKE-128                   SHAKE-256                        SHAKE-256
+
+
+
+Block ciphers. We use two block-cipher primitives, denoted Enc and Enc∗ . Their concrete
+instantiations coincide for Categories I and V, but differ for Category III because the 256-bit
+key and block sizes of Rijndael-256-256 do not match λ = 192. For Category III, we instantiate
+Enc from Rijndael-256-256 as
+
+                   Enc(key, ptx) := Rijndael-256-256((key ∥ 064 ), (ptx ∥ 064 )) ,
+
+whereas Enc∗ is instantiated as
+
+              Enc∗ (key, ptx) := LSB192 Rijndael-256-256((key ∥ 064 ), (ptx ∥ 064 )) ,
+                                                                                    
+
+
+where LSB192 returns the 192 least significant bits. Consequently, the key and plaintext sizes
+of both Enc and Enc∗ are always λ bits, and the ciphertext size of Enc∗ is also always λ bits.
+In contrast, the ciphertext size of Enc may be larger than λ. We denote this size by nctx-bitsize ,
+with                                     (
+                                          128 for Category I,
+                         nctx-bitsize :=
+                                          256 for Categories III and V.
+The distinction between Enc and Enc∗ allows us, in contexts where a λ-bit block is not required,
+to take full advantage of the larger block size of Rijndael-256-256 for Category III.
+
+Domain separation. To provide domain separation between cipher calls, we define a routine
+TweakSalt that takes a salt as input and returns a tweaked version of it. Its 24 least significant
+bits are set using the given tweak value, while its most significant bits encode the given input
+bit and the instance variant.
+16                   The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+Algorithm 5 TweakSalt(salt, twk, b)
+Input: a salt salt ∈ {0, 1}λ , a tweak value twk ∈ {0, . . . , 224 − 1}, a bit b ∈ {0, 1}
+Output: a tweaked salt tweaked salt ∈ {0, 1}λ
+ 1: tweaked salt = salt
+ 2: tweaked salt[0 : 24] = LittleEndian(twk)             ▷ The three first bytes are set using twk.
+ 3: if relying on the hash-based grinding then
+ 4:     tweaked salt[λ − 1] = b
+ 5: else                                                  ▷ when relying on cipher-based grinding
+ 6:     tweaked salt[λ − 1] = 0
+ 7:     tweaked salt[λ − 2] = b
+ 8: return tweaked salt
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                             17
+
+
+3.2.2 Pseudo-randomness generation
+Several subroutines used in the SD-in-the-Head-3 signature schemes involve pseudorandomness
+generation from a seed. Several seeds are expanded from a master seed in the key generation and
+in the signature algorithm (to generate the lines). One also needs to sample sequences of field
+elements from a seed in the key generation, the signature and verification algorithms. Finally
+pseudorandomness generation is also involved to derive the challenges (consistency challenge,
+batching challenge, and evaluation challenge) from the Fiat-Shamir hashes haux , hlines and hpiop .
+
+Pseudo-random generator. Most the pseudorandomness (everything except the Fiat-Shamir
+challenges) in SD-in-the-Head-3 is generated through a pseudo-random generator (PRG). Such
+a function takes a λ-bit seed seed ∈ {0, 1}λ and produces an arbitrary-long output bit-string
+y ∈ {0, 1}∗ whose length is tailored to the requirements of the application. Formally, a PRG
+is equipped with two routines: PRG.Init(seed) initializes the PRG state with the input seed ∈
+{0, 1}λ . Once initialized, the PRG can be queried with the routine PRG.GetByte() to generate
+the next byte of the output y associated to x. In our context, we use a block cipher Enc in counter
+mode as a secure pseudorandom generator (PRG). The concrete instance of the block cipher we
+use in the SD-in-the-Head-3 scheme is given in Section 3.2.1. We consider also a tweakable version
+of the pseudo-random generator. In that case, the initialization function PRG.Init(seed, salt, twk)
+might take two additional inputs, salt and twk. We describe in Algorithm 6 how concretely
+pseudo-random bytes are generated from a seed (and potentially a salt and a tweak value).
+
+Algorithm 6 PRG(seed, salt, twk, nbytes )
+Input: a seed seed ∈ {0, 1}λ , an optional salt ∈ {0, 1}λ , an optional tweak value twk ∈
+    {0, . . . , 255}, a number of bytes nbytes ∈ N
+Output: a pseudorandom byte string out ∈ {0, 1}8·nbytes
+ 1: nblocks ← ⌈8 · nbytes /nblock-bitsize ⌉
+ 2: twk salt ← TweakSalt(salt, 216 · twk, 0)                  ▷ Is set to 0λ if no salt is provided
+ 3: for i = 0 to nblocks − 1 do
+ 4:     block[i] ← Enc(key := seed, ptx := twk salt ⊕ LittleEndianλ (i))
+ 5: (byte[0] ∥ . . . ∥ byte[nblocks · (λ/8) − 1]) ← Parse(block[0] ∥ . . . ∥ block[nblocks − 1])
+ 6: out ← byte[0] ∥ . . . ∥ byte[nbytes − 1]
+ 7: return out
+
+
+
+Extendable output function. The pseudorandomness in SD-in-the-Head-3 for Fiat-Shamir
+challenges is generated through an extendable output hash function (XOF). Such a function
+takes an arbitrary-long input bit-string x ∈ {0, 1}∗ and produces an arbitrary-long output bit-
+string y ∈ {0, 1}∗ whose length is tailored to the requirements of the application. Formally,
+a XOF is equipped with two routines: XOF.Init(x) initializes the XOF state with the input
+x ∈ {0, 1}∗ . Once initialized, the XOF can be queried with the routine XOF.GetByte() to gen-
+erate the next byte of the output y associated to x. The concrete instance of the XOF we use
+in the SD-in-the-Head-3 scheme is given in Section 4.3. In our context, we use the XOF as a
+secure pseudorandom generator (PRG) which tolerates input seeds of variable lengths.
+
+Sampling (a vector of) field elements. The subroutine SampleFieldElements(src, F, n) samples
+n pseudorandom elements from F using the PRG/XOF src. It assumes that the XOF/PRG
+has been previously initialized. The implementation of the SampleFieldElements routine use
+18                         The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+the following process. It first generates from src a stream of bytes B1 , . . . , Bn′ for some
+n′ ≥ (n · log2 |F|)/8. Those bytes are converted into n field elements as follows:
+
+     • P
+       For Fq = F2 : The byte Bi is interpreted as 8 field elements bi,0 , . . . , bi,7 , such that Bi =
+            j
+         j 2 · bi,j . Interpreted all the bytes leads to a vector (b1,0 , . . . , b1,7 , . . . , bn′ ,0 , . . . , bn′ ,7 )
+       and the procedure returned the n first coordinates as the sampled field elements.
+
+     • For Fq = F2λ : The ith pack of λ8 consecutive bytes is returned as the ith sampled field
+       element.
+
+Sampling integers. The subroutine SampleIntegers(src, {0, . . . , m − 1}, n) samples n pseudo-
+random integers from {0, . . . , m − 1} using the XOF/PRG src, where m ≤ 232 . It assumes
+that the XOF/PRG has been previously initialized. The implementation of the SampleIntegers
+routine uses the principle of rejection sampling. While denoting tmax as the largest multiple of
+m smaller then (or equal to) 232 , the procedure goes as follows:
+
+              1: i = 1
+              2: while i ≤ n do
+              3:      for 0 ≤ j < 4 do
+              4:         Bj ← src.GetByte()
+              5:    v ← B0 + 256 · B1 + 2562 · B2 + 2563 · B3
+              6:    if v ∈ {0, 1, . . . , tmax − 1} then
+              7:        fi = B % m; i ++
+              8: return (f1 , . . . , fn )
+
+The number of generated bytes which are necessary to complete the process is non-determinisitic.
+
+Expansion of the parity-check matrix. The subroutine ExpandH takes as input λ-bit seed
+seedH and returns an (n − k) × k matrix of elements of Fq . This generated matrix is the random
+part H ′ of the parity-check matrix in standard form H = (H ′ |In−k ). A call to ExpandH(seedH )
+generates H ′ row-wise as follows:
+
+              1: prg ← PRG.Init(seedH )
+              2: for i from 0 to k − 1 do
+              3:      colsH ′ [i] ← SampleFieldElements(prg, Fq , n − k)
+                                                                                                   (n−k)×k
+              4: H ′ ← [colsH ′ [0] | . . . | colsH ′ [k − 1]]                         ▷ H ′ ∈ F2
+              5: return H ′
+
+Seed expansion (GGM tree). The subroutine ExpandSeed expands a salt, a parent seed and an
+index into two seeds. It is used to expand GGM trees. Specifically, a call to ExpandSeed(salt, seed, idx)
+runs the following procedure for Categories I and V:
+
+              1: ptx left ← TweakSalt(salt, 2 · idx + 0, 1)
+              2: ptx right ← TweakSalt(salt, 2 · idx + 1, 1)
+              3: left ← Enc∗ (key = seed, ptx = ptx left)
+              4: right ← Enc∗ (key = seed, ptx = ptx right)
+              5: return (left, right)
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                19
+
+
+Expansion of consistency check challenge. The subroutine ExpandConsistencyChallenge ex-
+pands the first Fiat-Shamir hash haux into the matrix M used for the consistency check. It
+consists of the following steps:
+           1: xof ← XOF.Init(haux )
+           2: for i from 0 to λ + B − 1 do
+           3:     rowsM [i] ← SampleFieldElements(xof, F2 , ℓ)
+                                                                ⊤                 (λ+B)×ℓ
+           4: M ← [rowsM [0] | . . . | rowsM [λ + B − 1]]                  ▷ M ∈ F2
+           5: return M
+
+Expansion of batching challenge. The subroutine ExpandBatchingChallenge expands the sec-
+ond Fiat-Shamir hash hlines into the batching challenges (γ ′ , γ). It consists of the following
+steps:
+           1: xof ← XOF.Init(hlines )
+           2: γ ← SampleFieldElements(xof, F2λ , n−k
+                                                          
+                                                  λ         )
+           3: γ ′ ← SampleFieldElements(xof, F2λ , w)
+           4: return (γ, γ ′ )
+
+
+Expansion of evaluation-opening challenge. The subroutine ExpandEvaluationChallenge ex-
+pands the third Fiat-Shamir hash hpiop into the evaluation-opening challenges i∗ [1], . . . , i∗ [τ ],
+where i∗ [e] is the hidden seed which should remain hidden for execution e. It also expands a
+wpow -bit grinding digest vpow , which will lead to a challenge rejection when it is non-zero. This
+subroutine takes as input the hash hpiop and a 32-bit counter ctr.
+  The expansion procedure depends on the considered instance variant. The variant based on
+hash-based grinding consists of the following steps:
+           1: xof ← XOF.Init(hpiop , ctr)
+           2: {i∗ [e]}e<τ ← SampleIntegers(xof, {0, . . . , 2κ − 1}, τ )
+           3: vpow ← SampleFieldElements(xof, F2 , wpow )
+           4: return ({i∗ [e]}e<τ , vpow )
+
+The variant based on cipher-based grinding consists of the following steps:
+           1: xof ← XOF.Init(hpiop , ctr)
+           2: (p0 ∥ p1 ∥ k0 ∥ k1 ) ← xof.GetBytes(4 · λ)
+           3: k0′ ← 0 ∥ Extract1→λ (k0 )
+           4: k1′ ← 1 ∥ Extract1→λ (k1 )
+
+           5: ctr bytes ← MapToBits(ctr)
+           6: p′0 ← ctr bytes ∥ Extract32→λ−1 (p0 ) ∥ 1
+           7: p′1 ← ctr bytes ∥ Extract32→λ−1 (p1 ) ∥ 1
+
+           8: c0 ← Enc∗ (key = k0′ , ptx = p′0 )
+           9: c1 ← Enc∗ (key = k1′ , ptx = p′1 )
+          10: vpow ← Extractwpow −1 (c0 ⊕ c1 )
+
+          11: xof ← XOF.Init(hpiop , ctr, c0 , c1 )
+          12: {i∗ [e]}e<τ ← SampleIntegers(xof, {0, . . . , 2κ − 1}, τ )
+
+          13: return ({i∗ [e]}e<τ , vpow )
+20                    The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+where Extractm→n (bitstring) takes as input a bitstring bitstring := (b0 , b1 , . . .) and returns
+the substring (bm , . . . , bn−1 ). Let us stress that Lines 1–4 and the key schedule of the encryption
+call can be factorized, as they do not depend on the counter. Moreover, Lines 11–12 can be
+omitted when vpow is the all-zero bitstring. The given pseudo-code is intended to provide a sim-
+ple specification of the routine, but implementations are encouraged to take these observations
+into account for performance reasons.
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                             21
+
+
+3.2.3 Hashing and commitments
+Several subroutines used in the SD-in-the-Head signature scheme involve cryptographic hashing.
+This is the case of the subroutines computing the Fiat-Shamir hashes and the commitments.
+We also use a cryptographic a hash function for the seed trees (hypercube variant) and the
+Merkle trees (threshold variant).
+
+Cryptographic hash function. The different hash and commitment subroutines are all derived
+from a common cryptographic hash function
+
+                                    Hash : {0, 1}∗ → {0, 1}2λ .
+
+The concrete instance of the hash function we use in the SD-in-the-Head scheme is given in
+Section 4.3.
+  We use domain separation for the different usages of the hash function. This is simply done
+by prepending a fixed byte value to the data to be hashed, as specified below for the different
+cases.
+
+Seed commitments. The subroutine CommitSeed takes as input a λ-bit salt, an index idx and
+a λ-bit seed, and it outputs a commitment digest for this seed. For performance reason, while
+we used hashing to commit to seeds in the first version of SD-in-the-Head, we use a block cipher
+in the second version. For Categories I and V, we build the commitment digest com for the
+seed seed as follows:
+   1: tweak ← τ · N + idx
+   2: ptx left ← TweakSalt(salt, 2 · tweak + 0, 1)
+   3: ptx right ← TweakSalt(salt, 2 · tweak + 1, 1)
+   4: left ← Enc∗ (key = seed, ptx = ptx left)
+   5: right ← Enc∗ (key = seed, ptx = ptx right)
+   6: com ← (left ∥ right)                                                   ▷ com ∈ {0, 1}2λ
+   7: return com
+
+Fiat-Shamir hashes.    The hash functions used to derive the Fiat-Shamir hashes are defined as:
+
+                                Hashbavc (data) := Hash(1 ∥ data)
+                                 Hashaux (data) := Hash(2 ∥ data)
+                                Hashlines (data) := Hash(3 ∥ data)
+                                Hashpiop (data) := Hash(4 ∥ data)
+
+where the prefixes 1, 2, 3 and 4 are encoded on one byte.
+22                     The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+3.2.4 All-but-one vector commitments
+SD-in-the-Head-3 relies on an all-but-one vector commitment (AVC). This primitive commits N
+random λ-bit seeds and later opens/reveals all of them except one. In practice, since we need
+τ such sets of N seeds, we will rely on the batched variant leveraging the one-tree optimisation
+from [BBM+ 24].
+
+
+Commitment routine. The commitment routine of the batched all-but-one vector commitment
+(BAVC) scheme is described in Algorithm 7. After expanding a large GGM tree of τ · N leaves
+using the routine ExpandSeed, it commits each seed using the routine CommitSeed where the
+(j + 1)th seed of the (i + 1)th repetition is the (i · τ + e + 1)th leaf of the big tree. Then it hashes
+all the seed commitments and the resulting digest hcom forms the global commitment of all the
+seeds. It outputs the tree and the seed commitments as the opening key.
+
+Algorithm 7 BAVC.Commit
+Input: a salt salt ∈ {0, 1}λ and a root seed rseed ∈ {0, 1}λ
+      ▷ Expand the GGM tree
+ 1: tree[1] ← rseed
+ 2: for i from 1 to (τ · N − 1) do
+ 3:      (tree[2i], tree[2i + 1]) ← ExpandSeed(salt, tree[i], i)
+
+      ▷ Commit the seeds
+ 4: for e from 0 to (τ − 1) do
+ 5:      for i from 0 to (N − 1) do
+ 6:         seeds[e][i] ← tree[τ · N + (i · τ + e)]
+ 7:         commit[e][i] ← CommitSeed(salt, seeds[e][i], i · τ + e)
+ 8:      hash com[e] ← Hashbavc (commit[e][0], . . . , commit[e][N − 1])
+
+      ▷ Set commitment and key
+ 9: hcom ← Hashbavc (salt, hash com[0], . . . , hash com[τ − 1])
+10: key ← tree ∥ commit
+11: return (seeds, hcom , key)
+
+
+
+
+Opening routine. The opening routine of the BAVC scheme is described in Algorithm 8. It
+takes as input the opening key (the tree nodes and the seed commitments) and the list of
+the seeds to remain hidden. It outputs the opening BAVC proof πBAVC , which will enable the
+verifier to recompute all the revealed leaves while checking their consistency with the BAVC
+commitment hcom . To proceed, the routine first searches the smallest set of tree nodes that
+enables to recompute all the leaves excluding those in the input list. This search algorithm
+involves a queue structure which comes with four dedicated subroutines:
+
+      • Queue.Init() returns a empty queue,
+
+      • Queue.Enqueue(v) pushes a value v at the end of the queue,
+
+      • Queue.Dequeue() pops the value which is at the top of the queue, and
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                               23
+
+
+      • Queue.Head() returns the value which is at the top of the queue without removing it.
+
+This routine follows the paths between the hidden leaves and the tree root, and at each inter-
+mediary node, decides whetever the sibling node should be in the output set. If the number of
+revealed nodes is larger than Topen , the routine aborts. At the end of the search algorithm, it
+pads the computed sibling paths with zeroes such that the result is always of Topen · λ bits. Fi-
+nally, it outputs the opening BAVC proof πBAVC made of the sibling paths and the commitments
+of all the hidden leaves.
+
+Algorithm 8 BAVC.Open
+Input: a BAVC key key and a set {i∗ [e]}e<τ of τ indexes in {0, . . . , N − 1}
+ 1: (tree, commit) ← key
+ 2: queue ← Queue.Init()
+ 3: for idx ∈ {i∗ [e] · τ + e : e ∈ {0, . . . , τ − 1}} in the decreasing order do
+ 4:    queue.Enqueue(τ · N + idx)
+ 5: path ← ∅
+ 6: while queue.Head() ̸= 1 do                            ▷ While the queue head is not the root
+ 7:    node idx ← queue.Dequeue()
+ 8:    if |queue| ≥ 2 then
+ 9:        sibling idx = node idx ⊕ 1
+10:        if queue.Head() = sibling idx then       ▷ Check if the queue head is the sibling node
+11:             queue.Dequeue()
+12:        else if |path| < Topen · λ then             ▷ Check if the sibling path is not too long
+13:             path ← path ∥ tree[sibling idx]           ▷ Append the sibling node to the path
+14:        else
+15:             return ⊥                        ▷ Return failure since the sibling path is too long
+16:    queue.Enqueue(⌊node idx/2⌋)
+17: path ← PadWithZero(path, Topen · λ)                                       ▷ path ∈ {0, 1}Topen ·λ
+18: commiti∗ ← (commit[0][i [0]], . . . , commit[τ − 1][i [τ − 1]]) ▷ commiti∗ ∈ {0, 1}τ ·(2λ)
+                               ∗                            ∗
+
+19: πBAVC ← (path, commiti∗ )
+20: return πBAVC
+
+
+
+
+Reconstruction routine. The reconstruction routine of the BAVC scheme is described in Al-
+gorithm 9. It takes as input the list of hidden seeds, the BAVC opening proof πBAVC (containing
+the sibling paths and the commitments of the hidden seeds) and the salt. Using the same search
+algorithm as in the opening routine, it prefills the tree with the nodes in the sibling paths. It
+checks whetever the used padding is valid (i.e. the padded bits are only zeroes). The routine
+then expands the GGM tree using the prefilled nodes and recomputes the commitments of all
+the revealed seeds. Finally, it recomputes the BAVC commitment hcom and returns it together
+with the revealed seeds.
+24                     The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+
+
+Algorithm 9 BAVC.Reconstruct
+Input: a set {i∗ [e]}e<τ of τ indexes in {0, . . . , N − 1}, a BAVC opening πBAVC and a salt
+   salt ∈ {0, 1}λ
+      ▷ Prefill the partial GGM tree
+ 1: (path, commiti∗ ) ← πBAVC
+ 2: queue ← Queue.Init()
+ 3: for idx ∈ {i∗ [e] · τ + e : e ∈ {0, . . . , τ − 1}} in the decreasing order do
+ 4:     queue.Enqueue(τ · N + idx)
+ 5: tree[1], . . . , tree[2 · τ · N − 1] ← ∅, . . . , ∅
+ 6: while queue.Head() ̸= 1 do                                    ▷ While the queue head is not the root
+ 7:     node idx ← queue.Dequeue()
+ 8:     if |queue| ≥ 2 then
+ 9:         sibling idx = node idx ⊕ 1
+10:         if queue.Head() = sibling idx then              ▷ Check if the queue head is the sibling node
+11:              queue.Dequeue()
+12:         else if |path| < Topen · λ then                    ▷ Check if the sibling path is not too long
+13:              (tree[sibling idx], path) ← path                        ▷ Extract the λ first bits of path
+14:         else
+15:              return ⊥                               ▷ Return failure since the sibling path is too long
+16:     queue.Enqueue(⌊node idx/2⌋)
+17: if |path| > 0 and path ̸= 0 then                                  ▷ Check that the padding is correct
+18:     return ⊥
+
+      ▷ Expand the partial GGM tree
+19: for i from 1 to (τ · N − 1) do
+20:      if tree[i] ̸= ∅ then
+21:               (nodes[2i], nodes[2i + 1]) ← ExpandSeed(salt, nodes[i], i)
+
+      ▷ Recompute commitment
+22: for e from 0 to (τ − 1) do
+23:    for i from 0 to (N − 1) do
+24:       if i ̸= i∗ [e] then
+25:            seeds[e][i] ← nodes[τ · N + (i · τ + e)]
+26:            com[e][i] ← CommitSeed(salt, seeds[e][i], i · τ + e)
+27:       else
+28:            seeds[e][i] ← ∅
+29:            (com[e][i] ∥ commiti∗ ) ← commiti∗
+30:    hash com[e] ← Hashbavc (com[e][0], . . . , com[e][N − 1])
+31: hcom ← Hashbavc (salt, hash com[0], . . . , hash com[τ − 1])
+32: return (hcom , seeds)
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                              25
+
+
+3.2.5 Batch line commitment
+As explained in Section 2.1, the prover in the PIOP protocol of SD-in-the-Head-3 needs to
+                                                                                         |wit|
+commit degree-1 vector polynomials Pwit := (P1 , . . . , P|wit| ) ∈ F2λ [X]                     such that Pwit (0) =
+       |wit|                                                                                              
+wit ∈ F2 , and Prnd := (Prnd,1,1 , . . . , Prnd,1,λ , . . . , Prnd,d−1,1 , . . . , Prnd,d−1,λ ) ∈ F2λ [X] (d − 1)λ
+                          (d−1)λ
+such that Prnd (0) ∈ F2  . Therefore, we propose a primitive named batch line commitment
+following the VOLEitH approach which is dedicated to commit (and later open evaluations of)
+these polynomials.
+
+Gray code ϕGray . The batch line commitment depends on a public one-to-one function ϕ :
+{1, . . . , N } → F1×κ
+                   2   . This function is used in the commitment procedure to commit polynomials
+while enabling the later opening of one evaluation on a point from S := {ϕ(0), . . . , ϕ(N − 1)}.
+While the definition of ϕ has no importance in the correctness and the soundness of the scheme,
+it might impact the performance. In the SD-in-the-Head-3 signature scheme, we use the Gray
+code for ϕ, namely we use
+
+                          ϕGray : i ∈ {0, . . . , N − 1} 7→ binκ (i) ⊕ (binκ (i)>>1) ,
+
+where
+
+                                       binκ (i) := (bκ−1 , . . . , b0 ) ∈ F21×κ ,
+                                   binκ (i)>>1 := (0, bκ−1 , . . . , b1 ) ∈ F21×κ ,
+
+with i = κ−1           j
+          P
+             j=0 bj · 2 . This code has the nice property that two consecutive values ϕGray (i) and
+ϕGray (i + 1) differ on only one position.
+  In Algorithm 10 and Algorithm 12, ϕGray is used to compute
+                                                    N
+                                                    X −1
+                                         racc ←            rrnd,i ,
+                                                    i=0
+                                                    N
+                                                    X −1
+                                        rbase ←            ϕGray (i) · rrnd,i .
+                                                     i=0
+
+Thanks to the structure of ϕGray , we can compute racc and rbase with only 2N bit operations,
+while it would be in O(N · κ) if we would use a natural bit-representation for ϕ. Indeed, we can
+compute
+                                           j
+                                           X
+                                racc,j ←         rrnd,i                                                         (4)
+                                           i=0
+                                           Xj
+                               rbase,j ←         racc,i · (ϕGray (i) − ϕGray (i + 1))                           (5)
+                                           i=0
+
+for all 0 ≤ j ≤ N − 1, assuming ϕGray (N ) = 0. Then, we can set racc and rbase respectively as
+26                     The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+racc,N −1 and rbase,j . Indeed, it comes from
+                                       N
+                                       X −1
+                        rbase =               racc,j · (ϕGray (j) − ϕGray (j + 1))
+                                       j=0
+                                       N −1     j
+                                                               !
+                                       X        X
+                                   =                  rrnd,i       · (ϕGray (j) − ϕGray (j + 1))
+                                       j=0      i=0
+                                       N
+                                       X −1              N
+                                                         X −1
+                                   =          rrnd,i ·         (ϕGray (j) − ϕGray (j + 1))
+                                       i=0               j=i
+                                       N
+                                       X −1
+                                   =          rrnd,i · ϕGray (i) .
+                                       i=0
+
+To sum up, we can compute racc using N bit operations using Equation (4), then we can compute
+rbase using just N additional bit operations using Equation (5) since ϕGray (i) − ϕGray (i + 1) has
+only one non-zero bit at a public position.
+
+The function ψ. The batch line commitment depends on a public one-to-one function ψ :
+Fτ2 ·κ → F2λ . In practice, we define ψ as
+                                                                         ·κ−1
+                                                                        τX
+                                              ψ : v ∈ Fτ2 ·κ 7→                   vi · ξ i ,
+                                                                            i=0
+
+where ξ is defined in Table 2.
+
+Commitment routine. The commitment routine of the batched line commitment (BLC) scheme
+is described in Algorithm 10. After expanding τ sets of N seeds using the BAVC scheme, it
+computes the polynomials P (0) , . . . , P (τ −1) as
+                                                                (e)                (e)
+                                                   P (e) = racc · X + rbase
+for all 0 ≤ e < τ , where
+                                        N
+                             (e)                (e)         |wit|+(d−1)λ+(λ+B)
+                                        X
+                          racc ←              rrnd,i ∈ F2
+                                        i=1
+                                           N
+                            (e)                                       (e)         |wit|+(d−1)λ+(λ+B)
+                                          X
+                         rbase ← −                 ϕGray (i) · rrnd,i ∈ F2κ
+                                             i=1
+       (e)
+with rrnd,i := PRG.Init(seeds[e][i]). As explained in Section 2.1, the signer can reveal one
+evaluation of those polynomials among N , while keeping the others hidden. We want to merge
+those τ vector polynomials into a single polynomial for which the signer will be able to reveal
+one evaluation among N τ . To proceed, we use the merging strategy of the VOLEitH framework.
+  However, since the merging strategy of the VOLEitH approach requires that P (0) , . . . , P (τ −1)
+encodes the same values (i.e. the leading terms should be the same), the routine computes an
+                           (0)     (e)
+auxiliary value ∆r (e) := racc − racc for all e > 0 to define the polynomials P ′(0) , . . . , P ′(τ −1) as
+                           (
+                             P (e)                                    if e = 0
+                  P ′(e) =     (e)       (e)          (0)       (e)
+                             P + (∆r ) · X = racc · X + rbase otherwise.
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                                  27
+
+
+From now, the signer has committed τ vector polynomials {P ′(e) }e<τ with the same leading
+term, but should convince the verifier that they really have the same leading term. To proceed,
+                                                             (e)
+it runs the consistency check which consists in computing Pα′ ∈ (F2κ )λ+B as [M | Iλ+B ] · P ′(e)
+for all e. More precisely, it expands the consistency challenge M and computes
+                                                                                (0)
+                                     α′plain := [M | Iλ+B ] · racc ∈ Fλ+B
+                                                                      2
+                         (e)
+(leading term of all Pα′ ’s) and
+                                          ′(e)                                  (e)
+                                     αbase := [M | Iλ+B ] · rbase ∈ Fλ+B
+                                                                     2κ
+                       (e)
+(constant term of Pα′ ) for all e.
+                                                         (e)
+  After hashing the consistency check output {Pα′ }e<τ , the signer merges the τ vector poly-
+nomials P ′(0) , . . . , P ′(τ −1) . The routine computes P̂ = ψ(P ′(0) , . . . , P ′(τ −1) ) as:
+                              (0)                  (0)             (1)
+              P̂ (X) = racc · X + ψ(rbase , . . . , rbase ) ∈ (F2λ [X])|wit|+(d−1)·λ+(λ+B) .
+We then define P̂wit as the |wit| first coordinates of P̂ and P̂rnd as the λ·(d−1) next coordinates.
+Then, the routine builds Prnd as X · P̂rnd (1/X) (i.e. it swaps the leading and the constant terms).
+For the witness polynomials, we need to enfore the constant term to be the input wit, so the
+routine computes ∆wit as wit − P̂ (∞) where P̂ (∞) is the leading term of P̂ and build Pwit as
+X · P̂wit (1/X) + ∆wit.
+  The commitment routine outputs the committed degree-1 polynomials Pwit and Prnd , together
+with their BLC commitment hlines , the BAVC key and the public auxiliary values.
+
+Opening routine. The opening routine of the BLC scheme is described in Algorithm 11. It
+takes as input a BAVC opening key and a hash digest. Using the routine ExpandEvaluationChallenge,
+it expands a pseudo-random evaluation point ∆inv defined as
+                                            ∆inv ← ψ([i∗ (0) , . . . , i∗ (τ −1) ]) ,
+where i∗ (e) ’s are pseudo-random values from {0, . . . , N − 1}. At the same time, it expands a
+random wpow -bit grinding value vpow . If the BAVC opening fails, the grinding value vpow is
+not zero or if ∆inv = 0 (and hence fails to be invertible), the routine increments a counter and
+re-expands an other challenge until the three conditions are satisfied. It outputs the counter
+and the BAVC opening proof.
+
+Recomputation routine. The recomputation routine ot the BLC scheme is described in Al-
+gorithm 12. It first re-expands the evaluation challenge using ExpandEvaluationChallenge and
+checks vpow = 0 and ∆inv ̸= 0. After the check, it deduces the evaluation point ∆ := (∆inv )−1 .
+It gets all the opened seeds using BAVC.Reconstruct, i.e. all the seeds except those in {i∗ [e]}e<τ .
+It computes P (0) (ϕGray (i∗ (0) )), . . . , P (τ −1) (ϕGray (i∗ (τ −1) )) using the relation
+                                                            N                                         
+                                                                                                           (e)
+                                                            X
+                                         ∗ (e)
+               ∀e, P   (e)
+                             (ϕGray (i           )) =                       ϕGray (i∗ (e) ) − ϕGray (i) · rrnd,i ,
+                                                        i=1,i̸=i∗ (e)
+
+       (e)
+with rrnd,i := PRG.Init(seeds[e][i]). It then deduces P ′(e) (ϕGray (i∗ (e) )) for all e, using the
+relation
+                                       (
+                                        P (e) (ϕGray (i∗ (e) ))                  if e = 0
+        ∀e, P ′(e) (ϕGray (i∗ (e) )) =    (e)          ∗ (e)    (e)      ∗ (e)
+                                        P (ϕGray (i )) + (∆r ) · ϕGray (i ) otherwise.
+28                       The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+Algorithm 10 BLC.Commit
+                                                                                         |wit|
+Input: a salt salt ∈ {0, 1}λ , a root seed rseed ∈ {0, 1}λ , and a witness wit ∈ F2
+
+      ▷ Phase 1: Expand seeds.
+ 1: (seeds, hcom , key) ← BAVC.Commit(salt, rseed)
+
+      ▷ Phase 2: Folding.
+ 2: for e from 0 to (τ − 1) do
+                                                                                     [|wit|+(d−1)λ+(λ+B)]×1
+ 3:      racc [e] = 0                                            ▷ racc [e] ∈ F2
+                                                                               [|wit|+(d−1)λ+(λ+B)]×1
+ 4:      rbase [e] = 0                                          ▷ rbase [e] ∈ F2κ
+ 5:      for i from 0 to (N − 1) do
+ 6:          prg ← PRG.Init(seeds[e][i], salt, e)
+ 7:          rrnd ← PRG.SampleFieldElements(prg, F2 , |wit| + (d − 1)λ + (λ + B))
+ 8:          racc [e] += rrnd
+ 9:          rbase [e] += rrnd · ϕGray (i)                        ▷ ϕGray : {0, . . . , 2κ − 1} → F21×κ
+10:    if e > 0 then
+11:        aux[e] ← racc [0] − racc [e]
+                                                                                     [|wit|+(d−1)λ+(λ+B)]×1
+12: u ← racc [0]                                                            ▷ u ∈ F2
+                                                                                 [|wit|+(d−1)λ+(λ+B)]×[τ ·κ]
+13: V ← [rbase [0], . . . , rbase [τ − 1]]                               ▷ V ∈ F2
+14: haux = Hashaux (hcom , aux[1], . . . , aux[τ − 1])
+
+      ▷ Phase 3: Run consistency check.
+                                                                                       (λ+B)×(|wit|+(d−1)λ)
+15: M ← ExpandConsistencyChallenge(haux )                                    ▷ M ∈ F2
+                                                                                                 [λ+B]×1
+16: α′plain = [Iλ+B | M ] · u                                                       ▷ α′plain ∈ F2
+                                                                                                 (λ+B)×(τ ·κ)
+17: α′base = [Iλ+B | M ] · V                                                      ▷ α′base ∈ F2
+
+      ▷ Phase 4: Build lines.
+18: (. . . ∥ rwit ∥ rrnd ) = u where |rwit | = |wit| and |rrnd | = λ · (d − 1)
+19: (rbase,wit ∥ rbase,rnd ) = (ψ(V(λ+B)+1 ) ∥ . . . ∥ ψ(V(λ+B)+|wit|+(d−1)λ ))
+20:                                                                ▷ ψ : Fτ2 ·κ → F2λ , Vi ’s are rows of V
+21: ∆wit = wit − rwit
+22: Pwit (X) ← wit + rbase,wit · X
+23: Prnd (X) ← rrnd + rbase,rnd · X
+
+24: hlines = Hashlines (haux , α′plain , α′base , ∆wit)
+25: aux′ ← (aux ∥ α′plain ∥ ∆wit)
+26: return (Pwit , Prnd , hlines , key, aux′ )
+
+
+
+  Now, the verifier needs to check the consistency test. After expanding the consistency chal-
+                                                         (e)
+lenge M using ExpandConsistencyChallenge, it computes Pα′ (ϕGray (i∗ (e) )) as [M | Iλ+B ]P ′(e) (ϕGray (i∗ (e) ))
+                                 ′(e)    (e)     ′(e)     (e)                    ′(e)
+and deduces the constant term αbase of Pα′ as αbase := Pα′ (ϕGray (i∗ (e) )) − αplain · ϕGray (i∗ (e) ).
+                                                           (e)
+  After hashing the consistency check output {Pα′ }e<τ , the verifier computes P̂ (∆inv ) by
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                             29
+
+
+Algorithm 11 BLC.OpenRandomEvaluation
+Input: a BAVC opening key key and a hash digest hpiop ∈ {0, 1}2λ
+ 1: ctr ← 0                                                                                    ▷ 32-bit counter
+ 2: retry:
+ 3: ({i∗ [e]}e<τ , vpow ) ← ExpandEvaluationChallenge(hpiop , ctr)
+ 4: ∆inv ← ψ([i∗ [0], . . . , i∗ [τ − 1]])                                                          ▷ ∆inv ∈ F2λ
+ 5: πBAVC ← BAVC.Open(key, {i∗ [e]}e<τ )
+ 6: if πBAVC = ⊥ or vpow ̸= 0 or ∆inv = 0 then
+ 7:    ctr ← ctr + 1
+ 8:    goto retry
+ 9: pdecom = (ctr, πBAVC )
+10: return pdecom
+
+
+
+merging the τ evaluations P ′(0) (ϕGray (i∗ (0) )), . . . , P ′(τ −1) (ϕGray (i∗ (τ −1) )) as:
+                                                                                   
+                                                                                         |wit|+(d−1)λ+(λ+B)
+    P̂ (∆inv ) := ψ P ′(0) (ϕGray (i∗ (0) )), . . . , P ′(τ −1) (ϕGray (i∗ (τ −1) )) ∈ F2λ                  .
+
+They get P̂wit (∆inv ) as the |wit| first coordinates of P̂ (∆inv ) and P̂rnd (∆inv ) as the λ·(d−1) next
+coordinates. Then the routine computes prnd := Prnd (∆) as ∆ · P̂rnd (∆inv ) and pwit := Pwit (∆)
+as ∆ · P̂rnd (∆inv ) + ∆wit.
+  The reconstruction routine outputs the evaluations pwit and prnd , together with the evaluation
+point ∆ and the BLC commitment hlines .
+30                        The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+
+
+Algorithm 12 BLC.RecomputeEvaluation
+Input: a BLC auxiliary value aux′ , a BLC opening pdecom, a salt salt ∈ {0, 1}λ and a hash
+   digest hpiop ∈ {0, 1}2λ
+      ▷ Phase 1: Get evaluation point
+ 1: (ctr, πBAVC ) = pdecom
+ 2: (aux ∥ α′plain ∥ ∆wit) ← aux′
+ 3: ({i∗ [e]}e<τ , vpow ) ← ExpandEvaluationChallenge(hpiop , ctr)
+ 4: ∆inv ← ψ([i∗ [0], . . . , i∗ [τ − 1]])                                                  ▷ ∆inv ∈ F2λ
+ 5: if vpow ̸= 0 or ∆inv = 0 then
+ 6:   return (⊥, ⊥, ⊥, ⊥)
+ 7: ∆ ← (∆inv )−1
+
+      ▷ Phase 2: Expand seeds.
+ 8: hcom , seeds ← BAVC.Reconstruct({i∗ [e]}e<τ , πBAVC , salt)
+
+      ▷ Phase 3: Folding.
+ 9: for e from 0 to (τ − 1) do
+                                                                                   [|wit|+(d−1)λ+(λ+B)]×1
+10:      reval [e] = 0                                          ▷ reval [e] ∈ F2κ
+11:                                    ∗
+         for i ∈ {0, . . . , (N − 1)}\i [e] do
+12:          prg ← PRG.Init(seed[e][i], salt, e)
+13:          rrnd ← PRG.SampleFieldElements(prg, F2 , |wit| + (d − 1)λ + (λ + B))
+                                                                                                  1×[κ]
+14:          rshare [e] += rrnd · (ϕGray (i∗ [e]) − ϕGray (i))   ▷ ϕGray : {0, . . . , 2κ − 1} → F2
+15:      if e > 0 then
+16:          rshare [e] += aux[e] · ϕµe (i∗ [e])
+                                                                                [|wit|+(d−1)λ+(λ+B)]×[τ ·κ]
+17: Q ← [rshare [0], . . . , rshare [τ − 1]]                           ▷ Q ∈ F2
+18: haux = Hashaux (hcom , aux[1], . . . , aux[τ − 1])
+
+      ▷ Phase 4: Run consistency check.
+                                                                                     (λ+B)×(|wit|+(d−1)λ)
+19: M ← ExpandConsistencyChallenge(haux )                                  ▷ M ∈ F2
+                                                                                            [λ+B]×[τ ·κ]
+20: α′eval ← [Iλ+B | M ] · Q                                                    ▷ α′eval ∈ F2
+                                                                                           [λ+B]×[τ ·κ]
+21: α′base ← α′eval − α′plain · ∆inv                                           ▷ α′base ∈ F2
+
+      ▷ Phase 5: Build line evaluation.
+22: (reval,wit ∥ reval,rnd ) = (ψ(Qλ+B+1 ) ∥ . . . ∥ ψ(Q(λ+B)+|wit|+(d−1)λ ))
+23:                                                              ▷ ψ : F2τ ·κ → F2λ , Qi ’s are rows of Q
+24: pwit ← ∆wit + (∆ · reval,wit )
+25: prnd ← ∆ · reval,rnd
+
+26: hlines = Hashlines (haux , α′plain , α′base )
+27: return (∆, pwit , prnd , hlines )
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                                    31
+
+
+3.2.6 PIOP protocol
+As explained in Section 2.1 and Section 3.1, the PIOP protocol aims to compute the degree-d
+polynomial Pα such that
+                                                      m
+                                                      X
+                        Pα (X) = P0 (X) · X +               γj · fj (P1 (X), . . . , P|wit| (X)).
+                                                      j=1
+
+where
+
+    • P1 , . . . , P|wit| are the witness polynomials, i.e. Pwit := P1 , . . . , P|wit| ;
+                                                                                       
+
+    • P0 is the degree-(d − 1) masking polynomial built as
+                                                                
+                                       d−2 λ−1
+                                       X    X
+                             P0 (X) :=        ξ j · Prnd,i,j (X) · X d−2−i
+                                                i=0    j=0
+
+
+      with Prnd := (Prnd,0,0 , . . . , Prnd,0,λ−1 , . . . , Prnd,d−2,0 , . . . , Prnd,d−2,λ−1 ) and (1, ξ, ξ 2 . . .) is a
+      F2 -basis of F2λ ;
+
+    • {fj }j are the degree-d polynomial contraints that the SD-in-the-Head-3 witness wit should
+      satisfy (see Section 2.2).
+
+We have two types of polynomial constraints:
+
+   1. The first constraints consist of checking that the elementary vectors used to build the
+      chunks of x by tensor products have exactly one non-zero coordinate. Since the last
+      coordinates of those vectors is discarded from the witness (and then recovered as 1 minus
+      the sum of the other coordinates), we actually need to check that there is at most one
+      non-zero coordinate.
+
+   2. The other constraints consist of checking that the vector x obtained by concatenating the
+      tensor products of the elementary vectors satisfies the linear relation y = Hx.
+
+Parsing the input polynomials. The PIOP protocol takes                 the input vector polynomials Pwit
+and Prnd . The vector polynomial Pwit := P1 , . . . , P|wit| encodes the RSD witness wit, a bit-
+string made of the decomposition of the RSD solution x as elementary vectors (input of tensor
+products). The RSD witness wit can be parsed as bits {wi,j,k }i,j,k , where wi,j,k is the k th coordi-
+nates of the j th elementary vector in the tensor product of the ith chunk of the RSD solution x.
+By parsing Pwit in the same way, we can get the degree-1 polynomials {Pwi,j,k }i,j,k that encode
+the bits {wi,j,k }i,j,k .
+   The vector Prnd := (Prnd,1,1 , . . . , Prnd,1,λ , . . . , Prnd,d−1,1 , . . . , Prnd,d−1,λ ) contains λ · (d − 1)
+degree-1 polynomials with leading term from F2λ and constant term from F2 . These poly-
+nomials are used to build a degree-(d − 1) random polynomial P0 ∈ F2λ [X] as:
+                                                                            
+                                          d−2 λ−1
+                                          X      X
+                             P0 (X) :=                 ξ j · Prnd,i,j (X) · X i .
+                                               i=0    j=0
+
+  We describe in Algorithm 13 the routine that takes as inputs the vector polynomials Pwit and
+Prnd and outputs the set of degree-1 polynomials {Pwi,j,k }i,j,k that encode the bits {wi,j,k }i,j,k
+32                      The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+of the decomposition of the RSD solution and the degree-(d − 1) polynomial P0 . We then
+                                                                                          |wit|
+describe in Algorithm 14 the routine that takes as inputs the vectors pwit := Pwit (∆) ∈ F2λ
+                           |rnd|
+and prnd := Prnd (∆) ∈ F2λ         and outputs the set {Pwi,j,k (∆)}i,j,k and the value P0 (∆), for some
+field element ∆ ∈ F2λ .
+
+Algorithm 13 PIOP.Prover.Format
+Input: two degree-1 vector polynomials Pwit and Prnd .
+ 1: ind ← 0
+ 2: for i from 0 to w − 1 do
+ 3:     for j from 0 to d − 1 do
+ 4:        for k from 0 to µj − 2 do
+ 5:            Pwi,j,k ← (Pwit )ind                                                   ▷ Degree-1 polynomial
+ 6:            ind ← ind + 1
+               Pd−2 Pλ−1 j                    
+                                                    d−2−i
+ 7: P0 (X) ←     i=0     j=0 ξ · (Prnd (X))iλ+j · X                          ▷ Degree-(d − 1) polynomial
+
+ 8: return {Pwi,j,k }i,j,k , P0
+
+
+
+Algorithm 14 PIOP.Verifier.Format
+Input: a field element ∆ ∈ F2λ , two vectors pwit and prnd             ▷ pwit := Pwit (∆), prnd := Prnd (∆)
+ 1: ind ← 0
+ 2: for i from 0 to w − 1 do
+ 3:    for j from 0 to d − 1 do
+ 4:       for k from 0 to µj − 2 do
+ 5:           pwi,j,k ← (pwit )ind
+ 6:           ind ← ind + 1
+         Pd−2 Pλ−1 j                   
+                                             d−2−i
+ 7: p0 ←    i=0      j=0 ξ · (p rnd iλ+j · ∆
+                                   )
+
+ 8: return {pwi,j,k }i,j,k , p0
+
+
+
+                                                                                                    µ −1
+Checking elementary vectors. To check that a binary vector (wi,j,0 , . . . , wi,j,µj −2 ) ∈ F2 j has
+at most one non-zero coordinate, we check that for all k ̸= k ′ , we have wi,j,k ·wi,j,k′ = 0. However,
+to avoid performing O(µ2j ) multiplications, we instead check that the polynomial Di,j ∈ F2 [Y ]
+defined as:
+                                                                                                 
+                      µj −2                    µj −3                           µj −3
+                       X                       X                               X
+        Di,j (Y ) :=       Y k · wi,j,k  ·        Y (µj −1)k · wi,j,k  −        Y µj ·k · wi,j,k 
+                         k=0                     k=0                            k=0
+
+equals 0 ∈ F2 [Y ] for all 1 ≤ i ≤ w and 1 ≤ j ≤ d. For our considered parameters, the degree of
+these polynomials always satisfies
+                                    deg(Di,j ) = (µj − 3) · µj + 1 < 32 .
+Moreover, we always have d ≤ 4. Those two upper bounds imply:
+                                                           d
+                                                           X
+              ∀ 1 ≤ j ≤ d, Di,j (Y ) = 0 ∈ F2 [Y ] ⇔             ξ 32(j−1) · Di,j (ξ) = 0 ∈ F2λ .
+                                                           j=1
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                          33
+
+
+The check of the elementary vectors hence reduces to checking the right-hand side of the above
+equivalence.
+  Looking ahead, these relations will be batched using random coefficients for the definition of
+the polynomial Pα . Let v ′ = (v1′ , . . . , vw
+                                              ′ ) ∈ Fw the vector with coordinates defined as
+                                                     2λ
+
+                                                  d
+                                                  X
+                                          vi′ =         ξ 32(j−1) · Di,j (ξ) ,                              (6)
+                                                  j=1
+
+and let γ ′ ∈ Fw2λ
+                    be the challenge from the verifier. Checking the elementary vectors shall
+consist in checking γ ′⊤ · v ′ = 0 which implies v ′ = 0 with overwhelming probability over the
+randomness of γ ′ .
+  The routine PIOP.Prover.UnitaryCheck performs the computation of Di,j (ξ) from a prover
+standpoint, where each witness bit wi,j,k is encoded through a degree-1 polynomial Pwi,j,k (X).
+The routine PIOP.Verifier.UnitaryCheck performs the computation of Di,j (ξ) from a verifier
+standpoint, where each witness bit wi,j,k is encoded through a polynomial evaluation pwi,j,k :=
+Pwi,j,k (∆).
+
+Algorithm 15 PIOP.Prover.UnitaryCheck
+Input: arity µj , degree-1 polynomials Pwi,j,0 (X), . . . , Pwi,j,µj −2 (X) ∈ F2λ [X] for which the con-
+    stant terms are wi,j,0 , . . . , wi,j,µj −2 ∈ F2 .
+             Pµj −2 k
+ 1: sum1 ←          ξ · Pwi,j,k (X)
+             Pk=0
+               µj −3 (µj −1)k
+ 2: sum2 ←          ξ           · Pwi,j,k (X)
+             Pµk=0
+                j −3 µj ·k
+ 3: sum3 ←    k=0 ξ        · Pwi,j,k (X)
+ 4: return sum1 · sum2 − sum3                      ▷ Degree-1 polynomial (since the witness is well-built)
+
+
+Algorithm 16 PIOP.Verifier.UnitaryCheck
+Input: arity µj , evaluations pwi,j,0 , . . . , pwi,j,µj −2 ∈ F2λ                  ▷ ∀k, pwi,j,k := Pwi,j,k (∆)
+           Pµj −2 k
+ 1: sum1 ←          ξ · pwi,j,k
+           Pk=0
+              µj −3 (µj −1)k
+ 2: sum2 ←          ξ         · pwi,j,k
+           Pk=0
+              µj −3 µj ·k
+ 3: sum3 ←    k=0 ξ       · pwi,j,k
+ 4: return sum1 · sum2 − sum3
+
+
+
+Checking RSD linear constraints. We need to check the relation Hx = y where x = (e0 ∥
+. . . ∥ ew−1 ) is built as the concatenation of the elementary vectors ei resulting from the tensor
+products. Namely, we need to check
+                                w−1
+                                X m−1
+                                    X
+                         v :=             (ei )j · hi·m+j − y = (0, . . . , 0) ∈ F2n−k ,
+                                i=0 j=0
+
+where [h0 | h1 | . . . | hn−1 ] = H.
+  Looking ahead, the coordinates of this vector (encoded as polynomials) will be batched using
+random coefficients in the computation of Pα . To make this batching more efficient, we embed
+34                         The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+blocks from Fλ2 into elements of F2λ . Let ϕ be the linear F2 -linear field-embedding isomorphism:
+                                                                     λ
+                                                                     X
+                                   ϕ : (v1 , . . . , vλ ) ∈ Fλ2 7→         vi · ξ i−1 ,
+                                                                     i=1
+
+and let Φ be its block-wise variant:
+                                                                                             ⌈ n−k ⌉
+             Φ : v ∈ Fn−k
+                                                                                         
+                       2   7→ ϕ(v1 , . . . , vλ ), . . . , ϕ(. . . , vn−k , 0, . . . , 0) ∈ F2λ λ ,    (7)
+
+where the last block is padded with λ · n−k
+                                                   
+                                               λ       − (n − k) zeros. We have
+                                                                   ⌈ n−k ⌉
+                                 v = 0 ∈ Fn−k
+                                          2          ⇔ Φ(v) = 0 ∈ F2λ λ .
+                 ⌈ n−k ⌉
+  Now let γ ∈ F2λ λ be the challenge from the verifier. Checking the RSD linear constraints
+shall consist in checking γ ⊤ · Φ(v) = 0 which implies Φ(v) = 0 (and hence v = 0) with
+overwhelming probability over the randomness of γ. Then we observe that γ ⊤ · Φ(v) can be
+written as:
+                                        w−1 m−1
+                                                         [γ]
+                                        XX
+                           γ ⊤ · Φ(v) =        (ei )j · hi·m+j − y [γ] ,                (8)
+                                                 i=0 j=0
+where
+                     [γ]                                                          [γ]
+                   hj := γ ⊤ · Φ(hj ) ∀ 0 ≤ j ≤ n − 1                and        yj := γ ⊤ · Φ(y) .     (9)
+
+Mux tree for efficient evaluation. To compute γ ⊤ ·Φ(v), either as polynomial encoding on the
+prover side (i.e., in the computation of Pα ) or as evaluation encoding on the verifier side (i.e.,
+in the computation of Pα (∆)), a natural option would be to expand each elementary vector ei
+from the witness bits {wi,j,k }j,k and evaluate Equation 8. However, this approach would involve
+many field multiplications. We instead rely on a multiplexer tree (or “mux tree” for short).
+   For a vector b = (b0 , . . . , bµj −2 ) ∈ {0, 1}µj −1 such that wH (b) ≤ 1, and a vector u =
+                       µ
+(u0 , . . . , uµj ) ∈ F2λj , we define the µj -to-1 multiplexer gate as follows:
+                                                       
+                                                       
+                                                        u0       if b = 0
+                                                       
+                                                       u1
+                                                       
+                                                                  if b0 = 1
+                                    Muxµj : (b, u) 7−→             ..
+                                                       
+                                                       
+                                                                   .
+                                                       
+                                                         uµj −1 if bµj −2 = 1
+                                                       
+
+This gate can be efficiently implemented using µj − 1 multiplications:
+                                                           µj −1
+                                                            X
+                                 Muxµj (b, u) = u0 +               bj−1 · (uj − u0 ).
+                                                            j=1
+
+As explained in Section 2.2, the elementary vectors ei ’s composing the RSD solution x = (e0 ∥
+. . . ∥ em−1 ) are defined as:
+                                                                      
+                         bi,1,1          bi,2,1                   bi,d,1
+                   
+                        bi,1,2    
+                                       bi,2,2   
+                                                  
+                                                             
+                                                                 bi,d,2   
+                                                                           
+                           ..            ..                     ..     ∈ Fn/w .
+                                                                           
+             ei ←           .    ⊗        .     ⊗ ... ⊗          .
+                                                         
+                                                                           
+                                                                      
+                    bi,1,µ1 −1   bi,2,µ2 −1               bi,d,µd −1 
+                         P               P                        P
+                     1 − k bi,1,k    1 − k bi,2,k             1 − k bi,d,k
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                                       35
+
+                                             Pm                 [γ]
+For all i, we can observe that computing          j=0 (ei )j · hi·m+j is equivalent to computing the
+root noded,0 of a mux tree with arities (µ1 , . . . , µd ). Formally, for all 0 ≤ j ≤ d and 0 ≤ ℓ <
+µj+1 · . . . · µd , let
+                  ( [γ]
+                   hi·m+ℓ                                                                   if j = 0 (the tree leaves)
+      nodej,ℓ =                                                                     
+                   Muxµj       bi,j , (nodej−1,µj ·h , . . . , nodej−1,µj ·(ℓ+1)−1 )         if j > 0 (the tree nodes)
+
+                                                                                [γ]        [γ]
+where bi,j := (bi,j,1 , . . . , bi,j,µj −1 ). We denote MuxTree((hi·m , . . . , h(i+1)·m−1 ), {bi,j }j ) the root of
+the mux tree. Equation 8 now rewrites as:
+                                          w−1
+                                                                    [γ]        [γ]
+                                          X
+                           ⊤
+                        γ · Φ(v) =                    MuxTree((hi·m , . . . , h(i+1)·m−1 ), {bi,j }j ) .
+                                           i=0
+
+  We describe in Algorithm 17 the computation of the mux-tree root from the prover standpoint,
+where each witness bit wi,j,k is encoded through a degree-1 polynomial Pwi,j,k (X). We then
+describe in Algorithm 18 the computation of the mux-tree root from the verifier standpoint,
+where each witness bit wi,j,k is encoded through a polynomial evaluation.
+
+Algorithm 17 PIOP.Prover.MuxTree
+                               [γ]        [γ]
+Input: coefficients (hi·m , . . . , h(i+1)·m−1 ) ∈ Fm
+                                                    2λ
+                                                       ,
+       degree-1 polynomials {(Pwi,j,0 (X), . . . , Pwi,j,µj −2 (X))}j of F2λ [X]
+                                                [γ]           [γ]
+ 1: (node0,0 , . . . , node0,m−1 ) ← (hi·m , . . . , h(i+1)·m−1 )                                  ▷ degree-0 polynomials
+ 2: for j from 1 to d do
+ 3:       for h from 0 to µj+1 · . . . · µd − 1 do                                                
+                                          Pµj −2
+ 4:          nodej,ℓ ← nodej−1,µj ·h + k=0       Pwi,j,k (X) · nodej−1,µj ·h+(1+k) − nodej−1,µj ·h
+                                                                                 ▷ degree-j polynomials
+ 5: return noded,0                                                                                  ▷ degree-d polynomial
+
+
+Algorithm 18 PIOP.Verifier.MuxTree
+                               [γ]        [γ]
+Input: coefficients (hi·m , . . . , h(i+1)·m−1 ) ∈ Fm
+                                                    2λ
+                                                       ,
+           evaluations {(pwi,j,0 , . . . , pwi,j,µj −2 )}j ∈ Fµ2λ1 −1 × . . . × Fµ2λd −1            ▷ pwi,j,k := Pwi,j,k (∆)
+                                                [γ]           [γ]
+ 1: (node0,0 , . . . , node0,m−1 ) ← (hi·m , . . . , h(i+1)·m−1 )
+ 2: for j from 1 to d do
+ 3:       for h from 0 to µj+1 · . . . · µd − 1 do                                            
+                                          Pµj −2
+ 4:          nodej,h ← nodej−1,µj ·h + k=0       pwi,j,k · nodej−1,µj ·h+(1+k) − nodej−1,µj ·h
+
+ 5: return noded,0
+
+
+
+
+PIOP Prototocol. We describe in Algorithm 19 the prover’s computation in the PIOP proto-
+col, namely how the prover compute        the polynomial Pα from the masking polynomial P0 and
+the witness Pwit := P1 , . . . , P|wit| . The first step consists in formatting the input polynomials
+36                     The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+using the routine PIOP.Prover.Format: it parses the vector polynomial Pwit as {Pwi,j,k }i,j,k and
+builds the degree-(d − 1) masking polynomial P0 from the degree-1 vector polynomial Prnd .
+Next, the verifier challenge (γ ′ , γ), i.e., the randomness for batching the relations, is generated
+                                                                                              [γ]
+by hashing the BLC commitment hlines . Then the batched field-embedded elements {hj } and
+y [γ] are computed (see Equation 9). Finally, the polynomial Pα is computed as:
+                                   X
+           Pα (X) = P0 (X) · X +       γj · fj (P1 (X), . . . , P|wit| (X)).
+                                             j
+
+                  = P0 (X) · X
+                         w−1                                                                     
+                                                     [γ]            [γ]
+                         X
+                     +         PIOP.Prover.MuxTree (hi·m , . . . , h(i+1)·m−1 ), {Pwi,j,k (X)}j,k
+                         i=0
+                         |                                          {z                                }
+                                                       polynomial encoding γ ⊤ ·Φ(v)
+                         w−1
+                         X             d−1
+                                       X
+                     +         γi′ ·         ξ 32(j−1) · PIOP.Prover.UnitaryCheck(µj , {Pwi,j,k (X)}k )
+                         i=0           j=0
+                         |                                          {z                               }
+                                                       polynomial encoding γ ′⊤ ·v ′
+
+
+
+Algorithm 19 PIOP.Prover.Run
+Input: two vector polynomials Pwit ∈ (F2λ [X])|wit| and Prnd ∈ (F2λ [X])|rnd| , a hash digest
+    hlines ∈ {0, 1}2λ and the regular syndrome instance (H ′ , y).
+Output: a degree-d polynomial Pα of F2λ [X]
+                        
+ 1: {Pwi,j,k }i,j,k , P0 ← PIOP.Prover.Format(Pwit , Prnd )
+                                                                               ⌈ n−k ⌉
+ 2: (γ, γ ′ ) ← ExpandBatchingChallenge(hlines )                     ▷ γ ∈ F2λ λ , γ ′ ∈ Fw2λ
+                   
+         [γ]    [γ]                              ′
+ 3: {hj }j , y        ← BatchLinearEquations(γ, H , y)
+
+      ▷ Compute the degree-α output polynomial Pα (X).
+ 4: Pα (X) ← P0 (X) · X − y [γ]
+ 5: for i from 0 to w − 1 do                                                                 
+                                                       [γ]      [γ]
+ 6:      Pα (X) ← Pα (X) + PIOP.Prover.MuxTree (hi·m , . . . , h(i+1)·m−1 ), {Pwi,j,k (X)}j,k
+         Pα (X) ← Pα (X) + γi′ · dj=1 ξ 32(j−1) · PIOP.Prover.UnitaryCheck(µj , {Pwi,j,k (X)}k )
+                                P
+ 7:
+
+ 8: return Pα (X)
+
+
+Remark 1. Let us emphasize that, by design, the constant term of Pα (X) is zero. Consequently,
+the PIOP implementation can omit its computation, in which case the batched syndrome y [γ]
+does not need to be computed, as it is no longer used.
+   Algorithm 20 describes the verifier’s computation in the PIOP protocol, namely how the
+verifier computes the evaluation pα = Pα (∆) from the evaluations P0 (∆) and Pwit (∆). The first
+step consists in formatting the input evaluations using the routine PIOP.Verifier.Format: it parses
+the evaluation vector pwit = Pwit (∆) as {pwi,j,k }i,j,k = {Pwi,j,k (∆)}i,j,k and builds the evaluation
+p0 = P0 (∆) from the evaluation vector prnd = Prnd (∆). Next, the verifier challenge (γ ′ , γ),
+i.e., the randomness for batching the relations, is generated by hashing the BLC commitment
+                                                         [γ]
+hlines . Then the batched field-embedded elements {hj } and y [γ] are computed (see Equation 9).
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                     37
+
+
+Finally, the evaluation pα = Pα (∆) is computed in the same way as the polynomial Pα on the
+prover side (see above equation).
+
+Algorithm 20 PIOP.Verifier.Run
+                                                                |wit|                |rnd|
+Input: a field element ∆ ∈ F2λ , two vectors pwit ∈ F2λ and prnd ∈ F2λ , a hash digest
+    hlines ∈ {0, 1}2λ and the regular syndrome instance (H ′ , y).
+Output: a field element pα ∈ F2λ
+                        
+ 1: {pwi,j,k }i,j,k , p0 ← PIOP.Verifier.Format(pwit , prnd )
+                                                                          ⌈ n−k ⌉
+ 2: (γ, γ ′ ) ← ExpandBatchingChallenge(hlines )                   ▷ γ ∈ F2λ λ , γ ′ ∈ Fw
+                                                                                        2λ
+                   
+         [γ]    [γ]                                ′
+ 3: {hj }j , y         ← BatchLinearEquations(γ, H , y)
+
+      ▷ Compute the evaluation pα := Pα (∆).
+ 4: pα ← p0 · ∆ − y [γ]
+ 5: for i from 0 to w − 1 do                                                        
+                                                [γ]       [γ]
+ 6:      pα ← pα + PIOP.Verifier.MuxTree (hi·m , . . . , h(i+1)·m−1 ), {pwi,j,k }j,k
+         pα ← pα + γi′ · dj=1 ξ 32(j−1) · PIOP.Verifier.UnitaryCheck(µj , {pwi,j,k }k )
+                        P
+ 7:
+
+ 8: return pα
+
+
+
+Algorithm 21 BatchLinearEquations
+Input: γ, H ′ , y
+ 1: for j from 0 to n − 1 do
+          [γ]                                     [γ]
+ 2:      hj ← γ ⊤ · Φ(hj )                     ▷ hj ∈ F2λ , hj is the j th column of H = [In−k | H ′ ]
+ 3: y [γ] ← γ ⊤ · Φ(y)                                                                       ▷ y [γ] ∈ F2λ
+                [γ]
+ 4: return {hj        }, y [γ]
+38                    The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+4 Parameters and performances
+In this section, we propose several parameter sets for the SD-in-the-Head signature scheme.
+As explained hereafter, those parameters have been selected to meet the security categories I,
+III and V defined by the NIST while targeting good performances (signature size and running
+times).
+
+4.1 Selection of parameters
+RSD parameters. The RSD parameters include three values: n the length of the code, krsd
+the dimension of the code and w the weight of the secret vector. We recall that in an RSD
+                                                        n
+instance, the secret vector is made of w blocks of size w and weight 1.
+                               max
+  For θ ∈ [1, ∞), we define krsd , the largest RSD dimension leading to RSD density ≤ 1/θ:
+                                           j        n          k
+                                max
+                              krsd  := n − w · log2      − log2 θ .
+                                                     w
+We further define ksd as the largest SD dimension leading to SD density ≤ 1 (for non-regular
+SD with parameters n and w):
+                                                   
+                                                    n
+                                   ksd := n − log2        .
+                                                    w
+
+  According to the security reduction provided in Section 5.1, for any krsd such that
+                                                       max
+                                         ksd ≤ krsd ≤ krsd
+
+an algorithm solving an (n, krsd , w)-RSD instance in complexity λ′ bits implies an algorithm
+solving an (n, ksd , w)-SD instance with complexity
+                                               n
+                                                  !
+                                    ′          w          1
+                                   λ + log2   n w    +        .                           (10)
+                                             (w )      θ ln 2
+
+   Parameters are chosen such that for λ′ ∈ {143, 207, 272} (corresponding to NIST Categories I,
+III and V), the best binary SD attacks for an (n, ksd , w)-instance have a complexity greater than
+(10). Thanks to our reduction (Theorem 5.1), finding an attack with complexity less than λ′ for
+an (n, krsd , w)-RSD instance would mean improving over the best known attacks for (n, ksd , w)-
+SD instances, the currently hardest type of SD instances (as being on the Gilbert-Varshamov
+bound). In practice for implementation reasons krsd is chosen as the greatest value such that
+n − krsd is a multiple of 8 and ksd ≤ krsd ≤ krsd    max .
+
+   Concretely, for our parameter selection, we proceeded as follows. For each w, we find the
+smallest n that is a multiple of w so that the (n, ksd , w)-SD instance achieve security (10). We
+then set krsd as the largest number ≤ krsd       max such that the codimension n − k
+                                                                                       rsd is an exact
+multiple of 8. Then for each degree d (we test them all), we consider the mux arities µ =
+(µ1 , . . . , µd ) that minimizes the witness size w (the greedy algorithm that selects µ1 = ⌈n/w⌉1/d
+and continues recursively for (µ2 , . . . , µd ) on ⌈n/w/µ1 ⌉ yields the optimum). We finally set the
+degree d as the one that minimizes w + λ.(d − 1), and thus, the total signature size. The results
+are provided in Table 3 hereafter. The best parameters are obtained for arities µ = (4, 4, 4, 4)
+or µ = (4, 4, 4, 3), inducing block sizes of either 256 or 192, with rather large values of n.
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                              39
+
+
+Proof system parameters. For each security level, we consider two variants: a “short” variant
+with larger GGM trees (decreasing the number of repetitions τ and hence the signature size),
+and a “fast” variant with smaller GGM trees (making the computation faster). For the “short”
+variant, we use N = 211 for Category I and N = 212 for Categories III and V. For the “fast”
+variant, we use N = 28 for all three categories. To achieve a soundness of λ bits, with λ ∈
+{128, 192, 256} (for Categories I, III and V), we must select the number of repetitions τ , and
+the grinding parameter wpow , to satisfy:
+
+                                   τ · κ − log2 (d) + wpow ≥ λ ,
+
+where κ = log2 (N ). Concretely, we choose τ such that wpow := λ+log2 (d)−τ ·κ is a small integer,
+typically lower than 5 for the “fast” variants, and up to 10 for the “short” variants. This strategy
+yields wpow = 2 for the “fast” variants at each security level while we get wpow ∈ {2, 6, 9} for
+the “short” variant. Finally, we fix the value of Topen based on experiments to obtain good
+trade-offs between sizes and performances.
+  The proof system relies on the field on a λ-bit field, namely F2128 , F2192 and F2256 depending
+on the security level. Table 2 summarizes the field extensions that we use in our instances.
+
+                             Table 2: Definition of field extensions.
+
+                         Field (F2λ )               Field extension
+                            F2128         F2 [ξ]/⟨ξ 128 + ξ 7 + ξ 2 + ξ 1 + 1⟩
+                            F2192         F2 [ξ]/⟨ξ 192 + ξ 7 + ξ 2 + ξ 1 + 1⟩
+                            F2256         F2 [ξ]/⟨ξ 256 + ξ 10 + ξ 5 + ξ 2 + 1⟩
+
+
+4.2 Keys and signature sizes
+Public key. The public key has format pk := (seedpk , y); consisting of a λ-bit seed seedpk
+used to generate the matrix H ′ , and a serialized vector y := Hx ∈ F2n−k corresponding to the
+syndrome. The public key has a total size (in bytes) of
+                                              1
+                                        |pk| = (λ + n − k) .
+                                              8
+
+Secret key. The secret key has format sk := (seedpk , y, wit); consisting of the same seedpk and
+y as the public key, as well as the serialized witness wit. The latter is made of w sets of d
+truncated elementary vectors of size µ1 − 1, . . . , µd − 1. Thus, the size of the secret key (in
+bytes) is
+                                l1                       d
+                                                        X           m
+                         |sk| =     λ + (n − k) + w ·       (µi − 1) .
+                                  8
+                                                            i=1
+40                       The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+Signature size. The size (in bits) of a signature is:
+
+              |σ| = 3λ                                                             → salt, hpiop
+                  + (τ − 1) · (|wit|2 + (d − 1)λ + (λ + B))                        → aux
+                  + (λ + B)                                                        → α′plain
+                  + |wit|2                                                         → ∆wit
+                  + (d − 1) · λ                                                    → (α2 , . . . , αd )
+                  + λ · Topen + τ · (2λ) + 32                                      → pdecom
+                            Pd
+with |wit|2 := ceil8 (w ·       i=1 (µi − 1)), where ceil8 (x) = 8 · ⌈x/8⌉.
+
+
+4.3 Selected parameters
+The signature parameters of our proposed instances are summarized in Table 3 and in Table 4
+for the different security categories. Table 3 gives the syndrome decoding parameters which are
+common to both trade-offs while Table 4 gives the proof system parameters and associated sizes
+for the main instances based on hash-based grinding. Finally, Table 5 gives the proof-system
+parameters and associated sizes for the alternative instances based on cipher-based grinding.
+
+                                Table 3: RSD parameters of SD-in-the-Head-3.
+
+      Parameter      NIST Security                           RSD Parameters                             Modeling
+         Sets
+                     Category        Bits        q      n       (n − krsd )     krsd       w                 µ
+     SDitH3-L1-gf2          I         143        2    10 360         432        9 928     56              [4,4,4,3]
+     SDitH3-L3-gf2       III          207        2    18 396         592        17 804    73              [4,4,4,4]
+     SDitH3-L5-gf2          V         272        2    19 864         800        19 064    104             [4,4,4,3]
+
+
+
+Table 4: Proof system parameters, key sizes and signature sizes, when using the hash-based
+         grinding.
+
+                  Parameter                 Proof System Parameters                Sizes (Bytes)
+                     Set
+                                            κ    τ    wpow     Topen       B      pk     sk      Sig.
+             SDitH3-L1-gf2-short            11   11     9      109         16     70     147     3 721
+             SDitH3-L1-gf2-fast              7   18     4      107         16     70     147     4 914
+             SDitH3-L3-gf2-short            11   17     7      169         16     98     208     8 484
+             SDitH3-L3-gf2-fast              7   27     5      161         16     98     208    10 852
+             SDitH3-L5-gf2-short            11   23     5      228         16    132     275    15 147
+             SDitH3-L5-gf2-fast              7   36     6      216         16    132     275    19 144
+
+
+
+4.4 Benchmarks
+Table 6 provides benchmarks for the key-generation, signing, and verification algorithms of SD-
+in-the-Head-3 on a cloud server. The reported timings are the medians over 10 000 runs. The
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                         41
+
+
+Table 5: Proof system parameters, key sizes and signature sizes, when using the cipher-based
+         grinding.
+
+                Parameter                Proof System Parameters                     Sizes (Bytes)
+                   Set
+                                         κ       τ    wpow      Topen    B         pk       sk    Sig.
+       SDitH3-L1-gf2-short-cipherpow     11      11    9         109     16        70      147   3 721
+       SDitH3-L1-gf2-fast-cipherpow       7      17    11        101     16        70      147   4 643
+       SDitH3-L3-gf2-short-cipherpow     11      17    7         169     16        98      208    8 484
+       SDitH3-L3-gf2-fast-cipherpow       7      26    12        155     16        98      208   10 452
+       SDitH3-L5-gf2-short-cipherpow     11      23    5         228     16        132     275   15 147
+       SDitH3-L5-gf2-fast-cipherpow       7      36    6         216     16        132     275   19 144
+
+
+
+timings for the alternative instances using cipher-based grinding correspond to the parameter
+sets reported in Table 5.
+
+Table 6: Timings on a cloud server with Intel Xeon Platinum 8259CL CPU @ 2.50GHz (median
+         after 10 000 runs).
+
+                                  Hash-based grinding                         Cipher-based grinding
+                              KeyGen      Sign         Verif            KeyGen           Sign      Verif
+     SDitH3-L1-gf2-short     0.066 Mc   10.14 Mc      9.04 Mc           0.067 Mc     9.21 Mc     9.01 Mc
+     SDitH3-L1-gf2-fast      0.066 Mc   2.11 Mc       1.86 Mc           0.066 Mc     2.08 Mc     1.78 Mc
+     SDitH3-L3-gf2-short     0.096 Mc   36.93 Mc      36.11 Mc          0.096 Mc    37.05 Mc     36.67 Mc
+     SDitH3-L3-gf2-fast      0.096 Mc   8.04 Mc        7.39 Mc          0.097 Mc     8.49 Mc      7.27 Mc
+     SDitH3-L5-gf2-short     0.148 Mc   55.94 Mc      55.21 Mc          0.148 Mc    57.05 Mc     56.27 Mc
+     SDitH3-L5-gf2-fast      0.148 Mc   12.21 Mc      11.33 Mc          0.148 Mc    12.43 Mc     11.61 Mc
+42                   The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+5 Security
+5.1 SD to RSD security reduction
+We provide hereafter a security reduction from SD to RSD. Namely, any SD instance can be
+solved using an RSD solver. The latter must be called a certain number of times which implies a
+security gap between the two instances. This gap must be compensated by increasing the RSD
+parameters. As explained in Section 4.1, this is precisely the approach we followed to select the
+RSD parameters of SD-in-the-Head-3.
+
+Theorem 5.1. Let F be a finite field. Let θ ∈ [1, ∞). Let n, ksd , krsd , w be positive integers
+such that ksd ≤ krsd ≤ n, w < n, w | n, and
+                                                 n
+                             krsd ≤ n − w · log2     − log2 θ .
+                                                  w
+Let Arsd be an algorithm solving a random (F, n, krsd , w)-instance of the regular syndrome
+decoding problem in time t with success probability εrsd . Then there exists an algorithm Asd
+solving a random (F, n, ksd , w)-instance of the standard syndrome decoding problem in time t
+with probability εsd , where
+                                                     n w
+                                                    
+                                    εsd ≥ e−1/θ ·    w 
+                                                      n  · εrsd .
+                                                      w
+                                                                                   n
+                                                                                     
+Remark 2. In the above theorem, for θ = 1, the constraint krsd ≤ n − w · log2 w        implies that
+the regular SD instance (F, n, krsd , w) has density at most 1. Taking a greater θ implies a lower
+density.
+
+Proof. We adapt the proof of [FJR22] to our context. To prove the theorem, we build an
+algorithm Asd to solve the traditional SD problem of parameters (n, k, w) using an algorithm
+Arsd which solves the regular SD problem with the same parameters.
+
+
+                      Algorithm Asd (on input an SD instance (H, y)):
+
+                       1. Sample a permutation σ of {1, . . . , n}.
+                       2. Permute the columns of H using σ to get Ĥ.
+                       3. Remove the krsd − ksd last rows of Ĥ and the last
+                                 krsd − ksd coordinates of y to obtain Ĥtr and ytr .
+                       3. Run Arsd on input (Ĥtr , ytr ) to get x̂.
+                       4. If x̂ = ⊥, return ⊥.
+                       5. If Ĥ x̂ ̸= y, return ⊥.
+                       6. Permute the coordinates of x̂ using σ −1 to get x.
+                       7. Return x.
+
+
+                                                                                         n w   n
+                                                                                                
+  The probability to transform an SD instance into a regular SD instance in Step 2 is    d   / w   .
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                      43
+
+
+Thus we have
+
+  εsd := Pr[Asd (H, y) ̸= ⊥]
+      ≥ Pr[Asd (H, y) ̸= ⊥ ∩ (Ĥ, y) is an RSD instance]
+         n w
+           
+         w 
+      = n · Pr[Asd (H, y) ̸= ⊥ | (Ĥ, y) is an RSD instance]
+           w
+          n w
+            
+          w 
+      =    n  · Pr[Arsd (Ĥtr , ytr ) ̸= ⊥ and Ĥ x̂ = y | (Ĥ, y) is an RSD instance]
+           w
+          n w
+            
+          w 
+      =    n  · Pr[Arsd (Ĥtr , ytr ) ̸= ⊥ | (Ĥ, y) is an RSD instance]
+           w
+                                · Pr[Ĥ x̂ = y | (Ĥ, y) is an RSD instance, Arsd (Ĥtr , ytr ) ̸= ⊥]
+
+By definition we have:
+
+                  Pr[Arsd (Ĥtr , ytr ) ̸= ⊥ | (Ĥ, y) is an RSD instance] = εrsd .
+
+On the other hand,
+
+  Pr[Ĥ x̂ = y | (Ĥ, y) is an RSD instance, Arsd (Ĥtr , ytr ) ̸= ⊥]
+                              ≥ Pr[(Ĥtr , ytr ) has a single RSD solution | Arsd (Ĥtr , ytr ) ̸= ⊥] .
+
+Indeed, if (Ĥtr , ytr ) has a single RSD solution, then given that (Ĥ, y) is an RSD instance, we
+have that the right solution is returned by Arsd . Now, we heuristically have:
+                                                                                             nbx
+                                                                                         1
+       Pr[(Ĥtr , ytr ) has a single RSD solution | Arsd (Ĥtr , ytr ) ̸= ⊥] ≈       1−              ,
+                                                                                        nby
+                                                                                              n w
+                                                                                                
+which is the probability
+                       that no other x̂ lead to the same ytr , with nbx =                    w   − 1 and
+                    n w
+nby = 2n−krsd ≤ θ · w   , implying
+
+                                           1 nbx
+                                             
+                                       1−        ≈ e−1/θ .
+                                          nby
+
+
+
+  Informally, the above result holds because an instance of the standard
+                                                                        SDn problem is an
+                                                                      n w
+instance of the regular syndrome decoding problem with probability w      / w . Moreover, a
+standard syndrome decoding instance can be “randomized” and input to the regular adversary
+as much as desired.
+  All the regular SD instances used in SD-in-the-Head are chosen such that the corresponding
+standard SD instance achieves a security level which compensates the degradation. We stress
+that this might be overly conservative.
+
+5.2 Attacks against the SD problem
+The binary SD problem has been studied for many years: the first attack was proposed by
+Prange in the 60’s. Later further attacks were proposed by Stern and Dumer at the turning
+of the 80’s and the 90’s. Many new attacks came out since 2010: Becker, Joux, May and
+44                      The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+Meurer [BJM+ 12] in 2012, then May and Ozerov [MO15] in 2015 and Both and May [BM18] in
+2018. Eventually a cryptographic estimator was proposed by Esser and Bellini in 2022 [EB22].
+   While original attacks did not use much memory, recent attacks make extensive use of memory.
+In this context, the cost of memory accesses (as a function of the memory size) is an essential
+parameter [EB22]. This cost can be considered to be constant, logarithmic, cubic root or square
+root. While a constant-time memory-access cost might seem very optimistic from the attacker
+standpoint (and hence over conservative), a square root access might seem too pessimistic (hence
+risky in terms of security). Unfortunately, there is no wide consensus on which cost is the most
+practically relevant.2 It is interesting to notice that considering a cubic or square root memory-
+access cost (which is theoretically meaningful) significantly limit the impact of recent attacks
+whose efficiency relies on the availability of a large memory.
+   For our SD security estimates, we made the conservative choices of considering a logarithmic
+memory-access cost and a memory size limited to 2143 for Category I, and 2160 for Categories
+III and V (which roughly corresponds to the number of atoms on earth). To derive our concrete
+parameters, we used the “Syndrome Decoding Estimator”, an open-source tool available at:
+https://github.com/Crypto-TII/syndrome_decoding_estimator.
+
+5.3 Unforgeability
+The SD-in-the-Head signature scheme aims at providing unforgeability against chosen message
+attacks (EUF-CMA). In this setting, the adversary is given a public key pk and they can ask
+an oracle (called the signature oracle) to sign messages (msg1 , . . . , msgr ) that they can select
+at will. The goal of the adversary is to generate a pair (msg, σ) such that msg is not one of
+requests to the signature oracle and such that σ is a valid signature of msg with respect to pk.
+     Our security statement is based on the following assumptions:
+
+      • SD hardness. Solving the considered SD instance is (ϵsd , t)-hard for some (ϵsd , t) which
+        are implicit functions of the security parameter λ. Formally, any adversary A on input a
+        random SD instance and running in time at most t has probability at most ϵsd to output
+        the solution of the input instance.
+
+      • Random Oracle Modem (ROM). Our security statement holds in the ROM where
+        the (extendable-output) hash function Hash is modelled as a random oracle.
+
+      • Ideal Cipher Model (ICM). Our security statement holds in the ICM where the block
+        cipher Enc is modelled as an ideal cipher.
+
+  In the ROM and the ICM, the EUF-CMA security of SD-in-the-Head follows from the sound-
+ness and zero-knowledge properties of the underlying ZK-PoK (overviewed in Section 2). A
+formal proof of the EUF-CMA security of SD-in-the-Head will be included in a future version of
+the specification. This proof will largely rely on standard techniques developed for MPC-in-the-
+Head signature schemes based on GGM trees. We refer the reader to the following works for
+the relevant security techniques [BBM+ 24; BBB+ 25; KX26b; KX25; FR26; Riv26; KX26a].
+
+
+
+
+ 2
+     See, e.g., https://groups.google.com/a/list.nist.gov/g/pqc-forum/c/EiwxGnfQgec/m/xBky_FKFDgAJ
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                         45
+
+
+6 Variants
+In this section, we outline three possible variants of SD-in-the-Head-3, namely a variant using
+the base field F256 , a variant using the Threshold-Computation-in-the-Head framework, and a
+simple variant without optimizations. We might consider including these variants as formal
+instances of the scheme in the future. In the following, we implicitly assume the use of hash-
+based grinding, although all three variants can naturally be instantiated with cipher-based
+grinding instead.
+
+6.1 The F256 variant
+In the previous sections, we focused on the RSD problem over the binary field F2 . We might
+                                                            (n−k)×n
+consider larger fields Fq , with q > 2. Given a matrix H ∈ Fq        and a syndrome vector
+      n−k                                                          n
+y ∈ Fq , the RSD problem over Fq consists in finding a vector x ∈ Fq such that
+
+   • x satisfies the linear relation y = Hx, and
+
+   • x is regular, meaning that it is the concatenation of w scaled elementary vectors e1 , . . . , ew
+             n                   n
+     of size w (i.e. vector with w  − 1 coefficients 0 and one non-zero random coefficient).
+
+The main difference when working on a larger field is that the non-zero coordinates of the
+solution x are not necessary 1, they can be other non-zero values. In this context, the witness
+wit should contain the value of those coordinates, together with their positions. To be able to
+embed the tensor-product decomposition of the RSD solution over F2 while working over Fq ,
+we need to consider fields of characteristic 2, i.e. binary field extensions. The size of the secret
+key (in bytes) is then
+
+                      l1                                d
+                                                        X                                          m
+             |sk| =        λ + (n − k) · log2 (q) + w ·   (µi − 1) +             w · log2 (q)           ,
+                       8                                                         | {z }
+                                                             i=1               Values of the
+                                                                            non-zero coordinates
+
+while the public key has a total size (in bytes) of
+                                           l1                               m
+                                  |pk| =            (λ + (n − k) · log2 (q)) .
+                                                8
+The polynomial constraints that the witness should satisfy are very similar to those of the F2
+case. The only difference comes from the fact that we need to scale each chunk ei by the non-
+zero value. In practice, this can be done just after applying the mux tree at each chunk. The
+size (in bits) of a signature is:
+
+             |σ| = 3λ                                                              → salt, hpiop
+                 + (τ − 1) · (|wit|2 + (d − 1)λ + (λ + B))                         → aux
+                 + (λ + B)                                                         → α′plain
+                 + |wit|2                                                          → ∆wit
+                 + (d − 1) · λ                                                     → (α2 , . . . , αd )
+                 + λ · Topen + τ · (2λ) + 32                                       → pdecom
+                                           Pd
+with |wit|2 := ceil8 (w · log2 (q) + w ·    i=1 (µi − 1)), where ceil8 (x) = 8 · ⌈x/8⌉.
+46                    The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+   We exhibit some instances over F256 in Table 3 and in Table 4 for the different security
+categories. Table 3 gives the syndrome decoding parameters which were obtained following the
+approach described in Section 4.1 adapted to F256 . Table 4 gives the proof system parameters
+(which are the same as for the F2 instances) and the associated sizes. We observe that we get
+similar sizes than over F2 .
+   While working on F2 can be considered as a more conservative choice than working on F256 , the
+latter has the main advantage to lead to a lighter scheme. In particular, the PIOP computation
+is expected to be significantly faster over F256 as requiring much fewer large-field multiplications.
+This is because the manipulated vectors are shorter while, on the other hand, the large field
+remains the same (i.e. F2λ ). Moreover, the uncompressed matrix H ′ is smaller over F256 . For
+instance, for Category I, we have 560 KB for H ′ on F2 versus 140 KB on F256 .
+
+                     Table 7: RSD parameters of SD-in-the-Head-3 for F256 .
+
+     Parameter       NIST Security                             RSD Parameters                           Modeling
+        Sets
+                     Category        Bits          q         n        (n − krsd )    krsd      w              µ
+  SDitH3-L1-gf256          I         143         256     2 176            64         2 112     34          [4,4,4]
+  SDitH3-L3-gf256         III        207         256     3 200            96         3 104     50          [4,4,4]
+  SDitH3-L5-gf256         V          272         256     4 224           120         4 104     66          [4,4,4]
+
+
+
+Table 8: Proof system parameters of SD-in-the-Head-3 over F256 , with key and signature sizes.
+
+       Parameter                Proof System Parameters                                    Sizes (Bytes)
+          Set
+                                κ     τ     wpow       Topen     B             pk    sk       Sig.    Baseline (F2 )
+  SDitH3-L1-gf256-short         11    11     9         109       16            80    153      3 677        3 721
+  SDitH3-L1-gf256-fast           7    18     4         107       16            80    153      4 842        4 914
+  SDitH3-L3-gf256-short         11    17     7         169       16            120   227      8 433         8 484
+  SDitH3-L3-gf256-fast           7    27     5         161       16            120   227     10 771        10 852
+  SDitH3-L5-gf256-short         11    23     5         228       16            152   293     15 101        15 147
+  SDitH3-L5-gf256-fast           7    36     6         216       16            152   293     19 072        19 144
+
+
+
+6.2 The TCitH variant
+As explained in Section 2.1, an alternative choice to the VOLE-in-the-Head framework [BBD+ 23]
+is the Threshold-Computation-in-the-Head (TCitH) framework [FR23a]. The TCitH-based
+commitment scheme enables the prover/signer to open one evaluation among only N , while
+the computational complexity of the commitment procedure is linear in N . While the PIOP
+soundness error is d/N τ for VOLEitH, it is (d/N )τ for TCitH with τ parallel repetitions, which
+means that we must ensure (d/N )τ · 2−wpow ≤ 2−λ to achieve a λ-bit security. The size (in bits)
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                                   47
+
+
+of a TCitH-based SD-in-the-Head-3 signature is:
+
+                 |σ| = 3λ                                       → salt, hpiop
+                    + τ · |wit|2                                → ∆wit
+                    + τ · (d − 1) · ceilκ (λ)                   → (α2 , . . . , αd )
+                    + λ · Topen + τ · (2λ) + 32                 → pdecom
+
+with |wit|2 := ceil8 (w · di=1 (µi − 1)), where ceiln (x) = n · ⌈x/n⌉.
+                         P
+   Table 9 gives the TCitH-based proof system parameters and the associated signature sizes.
+Let us stress that the key generation is the same in both approaches and so the key sizes are
+those in Table 4. We can observe that the signature sizes are larger when using the TCitH
+framework. This comes from the required increase of τ to maintain an equivalent security. This
+is particularly true for SD-in-the-Head-3, for which the RSD modeling leads to degree-4 (i.e.
+d = 4) constraints, while most of the schemes in the literature consider only degree-2. This size
+increasing is partly compensated by the fact that TCitH does not include the communication
+cost induced by the VOLEitH consistency check.
+   While it leads to larger signatures, the main advantage of the TCitH variant is to be struc-
+turally simpler: it does not have consistency check, it is derived from a 5-round interactive
+protocol (while the VOLEitH framework gives 7-round protocol), and it does not require to
+work in a large field extension.
+
+Table 9: Proof system parameters of the TCitH-based variant of SD-in-the-Head-3, with signa-
+         ture sizes. Key sizes are similar to our main VOLEitH-based instances.
+
+         Parameter                 Proof System Parameters            Signature Size (Bytes)
+            Set
+                                   κ     τ      wpow   Topen       TCitH       Baseline (VOLEitH)
+  SDitH3-TCitH-L1-gf2-short        11    14      2     127           4 303             3 721 (-14%)
+  SDitH3-TCitH-L1-gf2-fast          7    24      8     144           6 169             4 914 (-20%)
+  SDitH3-TCitH-L3-gf2-short        11    21      3     198          9 706           8 484 (-13%)
+  SDitH3-TCitH-L3-gf2-fast          7    37      7     219         13 898          10 852 (-22%)
+  SDitH3-TCitH-L5-gf2-short        11    28      4     268         17 244          15 147 (-12%)
+  SDitH3-TCitH-L5-gf2-fast          7    50      6     294         24 715          19 144 (-23%)
+
+
+
+6.3 The simple variant
+The SDitH scheme described in Section 3 results from the combination of several optimizations.
+While these optimizations reduce the signature size, they also make the scheme more difficult
+to understand and implement. In settings where signature size is not the primary concern, one
+may therefore prefer a simpler variant.
+  Let us consider the case where neither the one-tree optimization nor grinding is used. When
+48                      The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+working over the field F2 , the signature size (in bits) of this simplified variant is:
+
+             |σ| = 3λ                                                     → salt, hpiop
+                + (τ − 1) · (|wit|2 + (d − 1)λ + (λ + B))                 → aux
+                + (λ + B)                                                 → α′plain
+                + |wit|2                                                  → ∆wit
+                + (d − 1) · λ                                             → (α2 , . . . , αd )
+                + λ · τ · κ + τ · (2λ) + 32                               → pdecom
+
+with |wit|2 := ceil8 (w · di=1 (µi − 1)), where ceil8 (x) = 8 · ⌈x/8⌉.
+                         P
+  We report in Table 10 the corresponding proof-system parameters and signature sizes. As
+expected, the resulting signatures are larger. In return, the scheme is simpler to implement,
+easier to parallelize and stream, and its worst-case execution time coincides with its average-case
+execution time.
+  This simplification could be pushed further by combining it with the TCitH framework,
+yielding an even simpler construction at the cost of further increasing the signature size.
+
+Table 10: Proof system parameters of the simple variant of SD-in-the-Head-3, with signature
+          sizes.
+
+            Parameter                 Parameters                Signature Size (Bytes)
+               Set
+                                      κ       τ          Simple variant     Baseline (with optim.)
+     SDitH3-noopt-L1-gf2-short        11      12              4 264               3 721 (-13%)
+     SDitH3-noopt-L1-gf2-fast          7      19              5 505               4 914 (-11%)
+     SDitH3-noopt-L3-gf2-short        11      18              9 436               8 484 (-10%)
+     SDitH3-noopt-L3-gf2-fast          7      28             11 948               10 852 (-9%)
+     SDitH3-noopt-L5-gf2-short        11      24             16 636               15 147 (-9%)
+     SDitH3-noopt-L5-gf2-fast          7      37             20 857               19 144 (-8%)
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                            49
+
+
+7 Advantages and limitations
+In this section we describe some advantages and limitations of the SD-in-the-Head signature
+scheme. The bottom line is that it provides both conservative security and relatively small
+signatures compared to current PQC standards.
+
+7.1 Advantages of SD-in-the-Head
+Conservative hardness assumption. Our signature scheme is based on the presumably hard-
+est problem in code-based cryptography: the unstructured binary Syndrome Decoding (SD)
+problem for random linear codes. This problem is known to be NP-hard and the cryptanalysis
+state-of-the-art has been stable and well-established for decades.
+
+Adaptive and tunable parameters. MPCitH enables us to tailor parameters, in particular
+the size of GGM trees (i.e., the size of the small evaluation domain), meaning that we can
+provide a variety of parameter sets tailored to different use cases similarly to SPHINCS+ . This
+is illustrated by our “fast” and “short” parameter sets that provide two different signature
+sizes/performance trade-offs. In addition, the size of the signature is composed of two parts:
+a part related to GGM trees and a part related to the SD instance. The latter part is not
+the bottleneck so that increasing the size of the SD parameters (and hence the associated SD
+security) only has a moderate impact on the global signature size.
+
+Small code-based signatures. The SD-in-the-Head signature scheme achieves among the small-
+est code-based signatures to-date, which does not come at the cost of a large public key.
+
+Small key sizes. Both the secret key and public key sizes are much smaller in comparison to
+the lattice-based signature standards, and compete with SHL-DSA. In particular, the public
+key, which is often transported with the signature (e.g., certificates in TLS), is between 120-240
+bytes across all security levels for both variants.
+
+Size of public key and signature. SD-in-the-Head offers competitive signature sizes along
+with very small public keys, which yields a competitive signature + public key size. For NIST
+security level I, the sum of the signature and public key sizes of SD-in-the-Head gives 3.8 kB,
+which is comparable or smaller than the post-quantum NIST standards ML-DSA (Dillitium)
+and SLH-DSA (SPHINCS+) with 3.7 kB and 7.8 kB respectively.
+
+7.2 Limitations of SD-in-the-Head
+Quadratic growth w.r.t. the security level. As other MPCitH schemes, or, more generally,
+as other schemes applying the Fiat-Shamir transform to a parallelly repeated ZK-PoK with
+non-negligible soundness error, SD-in-the-Head suffers a quadratic growth of its signature size.
+
+Efficiency. MPCitH-like schemes require the generation of lots of pseudorandom objects, which
+makes them slow in comparison to other schemes such as the NIST post-quantum standard ML-
+DSA. Nonetheless, the efficiency of SD-in-the-Head is competitive when compared with many
+other post-quantum signature schemes.
+50                 The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+Low-cost devices and embedded systems. SD-in-the-Head might be particularly heavy for
+low-cost devices such as smart cards or embedded systems, although it has the potential to
+perform well on hardware as being highly parallelizable.
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                        51
+
+
+References
+[AGH+ 22]   C. Aguilar-Melchor, N. Gama, J. Howe, A. Hülsing, D. Joseph, and D. Yue. The
+            return of the SDitH. Cryptology ePrint Archive, Report 2022/1645, 2022 (cited on
+            page 2).
+[AGH+ 23]   C. Aguilar-Melchor, N. Gama, J. Howe, A. Hülsing, D. Joseph, and D. Yue. The
+            return of the SDitH. In C. Hazay and M. Stam, editors, EUROCRYPT 2023,
+            Part V, pages 564–596. Springer, Cham, 2023 (cited on page 1).
+[BBB+ 25]   C. Baum, W. Beullens, L. Braun, C. Delpech de Saint Guilhem, M. Klooß, C.
+            Majenz, S. Mukherjee, E. Orsini, S. Ramacher, C. Rechberger, L. Roy, and P.
+            Scholl. Shorter, tighter, FAESTer: optimizations and improved (QROM) analy-
+            sis for VOLE-in-the-head signatures. In Y. T. Kalai and S. F. Kamara, editors,
+            CRYPTO 2025, Part VI, pages 124–156. Springer, Cham, 2025 (cited on page 44).
+[BBD+ 23]   C. Baum, L. Braun, C. Delpech de Saint Guilhem, M. Klooß, E. Orsini, L. Roy,
+            and P. Scholl. Publicly verifiable zero-knowledge and post-quantum signatures from
+            VOLE-in-the-head. In H. Handschuh and A. Lysyanskaya, editors, CRYPTO 2023,
+            Part V, pages 581–615. Springer, Cham, 2023 (cited on pages 1–3, 46).
+[BBG+ 24]   S. Bettaieb, L. Bidoux, P. Gaborit, and M. Kulkarni. Modelings for generic PoK
+            and applications: shorter SD and PKP based signatures. Cryptology ePrint Archive,
+            Report 2024/1668, 2024 (cited on pages 2, 3, 7, 8).
+[BBM+ 24]   C. Baum, W. Beullens, S. Mukherjee, E. Orsini, S. Ramacher, C. Rechberger,
+            L. Roy, and P. Scholl. One tree to rule them all: optimizing GGM trees and
+            OWFs for post-quantum signatures. In K.-M. Chung and Y. Sasaki, editors, ASI-
+            ACRYPT 2024, Part I, pages 463–493. Springer, Singapore, 2024 (cited on pages 9,
+            22, 44).
+[BJM+ 12]   A. Becker, A. Joux, A. May, and A. Meurer. Decoding random binary linear codes
+            in 2n/20 : how 1 + 1 = 0 improves information set decoding. In D. Pointcheval
+            and T. Johansson, editors, EUROCRYPT 2012, pages 520–536. Springer, Berlin,
+            Heidelberg, 2012 (cited on page 44).
+[BM18]      L. Both and A. May. Decoding linear codes with high error rate and its impact for
+            LPN security. In T. Lange and R. Steinwandt, editors, PQCrypto 2018, pages 25–
+            46. Springer, Cham, 2018 (cited on page 44).
+[CDI05]     R. Cramer, I. Damgård, and Y. Ishai. Share conversion, pseudorandom secret-
+            sharing and applications to secure computation. In J. Kilian, editor, TCC 2005,
+            pages 342–362. Springer, Berlin, Heidelberg, 2005 (cited on page 4).
+[Del26]     J. L. Delgado. Cross-signature signing-key recovery and domain-separation repair
+            for SDitH v2. Cryptology ePrint Archive, Paper 2026/1808, 2026 (cited on page 1).
+[EB22]      A. Esser and E. Bellini. Syndrome decoding estimator. In G. Hanaoka, J. Shikata,
+            and Y. Watanabe, editors, PKC 2022, Part I, pages 112–141. Springer, Cham, 2022
+            (cited on page 44).
+[Fen24]     T. Feneuil. The Polynomial-IOP Vision of the Latest MPCitH Frameworks for
+            Signature Schemes. Post-Quantum Algebraic Cryptography - Workshop 2, Institut
+            Henri Poincaré, Paris, France, 2024 (cited on page 3).
+52                  The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme
+
+
+[FJR22]     T. Feneuil, A. Joux, and M. Rivain. Syndrome decoding in the head: shorter
+            signatures from zero-knowledge proofs. In Y. Dodis and T. Shrimpton, editors,
+            CRYPTO 2022, Part II, pages 541–572. Springer, Cham, 2022 (cited on pages 2,
+            7, 42).
+[FR22]      T. Feneuil and M. Rivain. Threshold linear secret sharing to the rescue of MPC-
+            in-the-head. Cryptology ePrint Archive, Report 2022/1407, 2022 (cited on page 2).
+[FR23a]     T. Feneuil and M. Rivain. Threshold computation in the head: improved framework
+            for post-quantum signatures and zero-knowledge arguments. Cryptology ePrint
+            Archive, Report 2023/1573, 2023 (cited on pages 3, 4, 46).
+[FR23b]     T. Feneuil and M. Rivain. Threshold linear secret sharing to the rescue of MPC-in-
+            the-head. In J. Guo and R. Steinfeld, editors, ASIACRYPT 2023, Part I, pages 441–
+            473. Springer, Singapore, 2023 (cited on pages 1, 3).
+[FR26]      T. Feneuil and M. Rivain. On the security of MPC-in-the-head signatures with
+            correlated GGM trees. Cryptology ePrint Archive, Paper 2026/615, 2026 (cited on
+            page 44).
+[FS87]      A. Fiat and A. Shamir. How to prove yourself: Practical solutions to identification
+            and signature problems. In A. M. Odlyzko, editor, CRYPTO’86, pages 186–194.
+            Springer, Berlin, Heidelberg, 1987 (cited on pages 3, 9).
+[GZL+ 26]   B. Gao, Z. Zhang, W. Li, J. Liu, and J. Ning. Elementary-vector modeling for
+            shorter VOLE-based signatures from SD and PKP. Cryptology ePrint Archive,
+            Paper 2026/1722, 2026 (cited on page 1).
+[HHH+ 26]   S. Halmans, N. Höher, D. Hesse, S. Deshpande, J. Szefer, and T. Güneysu. Storing
+            less in-the-head: an area-efficient hardware architecture for SDitH-v2. Cryptology
+            ePrint Archive, Paper 2026/938, 2026 (cited on page 1).
+[IKO+ 07]   Y. Ishai, E. Kushilevitz, R. Ostrovsky, and A. Sahai. Zero-knowledge from secure
+            multiparty computation. In D. S. Johnson and U. Feige, editors, 39th ACM STOC,
+            pages 21–30. ACM Press, 2007 (cited on pages 2, 3).
+[ISN89]     M. Ito, A. Saito, and T. Nishizeki. Secret sharing scheme realizing general access
+            structure. Electronics and Communications in Japan (Part III: Fundamental Elec-
+            tronic Science), (9):56–64, 1989. eprint: https : / / onlinelibrary . wiley . com /
+            doi/pdf/10.1002/ecjc.4430720906 (cited on page 4).
+[KX25]      H. Kosuge and K. Xagawa. New security proofs of MPC-in-the-head signatures in
+            the quantum random oracle model. Cryptology ePrint Archive, Report 2025/1999,
+            2025 (cited on page 44).
+[KX26a]     H. Kosuge and K. Xagawa. Towards formal security proofs of MQOM. Cryptology
+            ePrint Archive, Paper 2026/629, 2026 (cited on page 44).
+[KX26b]     M. Kulkarni and K. Xagawa. Strong existential unforgeability and buff securities of
+            mpc-in-the-head signatures: strong existential unforgeabilitym. kulkarni, k. xagawa.
+            Designs, Codes and Cryptography, 2026 (cited on page 44).
+[MO15]      A. May and I. Ozerov. On computing nearest neighbors with applications to de-
+            coding of binary linear codes. In E. Oswald and M. Fischlin, editors, EURO-
+            CRYPT 2015, Part I, pages 203–228. Springer, Berlin, Heidelberg, 2015 (cited
+            on page 44).
+The Syndrome Decoding in the Head (SD-in-the-Head) Signature Scheme                       53
+
+
+[OTX24]     Y. Ouyang, D. Tang, and Y. Xu. Code-based zero-knowledge from VOLE-in-the-
+            head and their applications: simpler, faster, and smaller. In K.-M. Chung and Y.
+            Sasaki, editors, ASIACRYPT 2024, Part V, pages 436–470. Springer, Singapore,
+            2024 (cited on pages 2, 3, 7, 8).
+[Riv26]     M. Rivain. AES-based grinding for MPC-in-the-head signatures. Cryptology ePrint
+            Archive, Paper 2026/1625, 2026 (cited on pages 10, 44).
+[ZCD+ 20]   G. Zaverucha, M. Chase, D. Derler, S. Goldfeder, C. Orlandi, S. Ramacher, C.
+            Rechberger, D. Slamanig, J. Katz, X. Wang, V. Kolesnikov, and D. Kales. Picnic.
+            Technical report, National Institute of Standards and Technology, 2020. available
+            at https://csrc.nist.gov/projects/post- quantum- cryptography/post-
+            quantum - cryptography - standardization / round - 3 - submissions (cited on
+            page 2).
+

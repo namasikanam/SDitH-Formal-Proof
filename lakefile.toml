@@ -1,0 +1,15 @@
+name = "sdith"
+version = "0.1.0"
+defaultTargets = ["SDitH"]
+
+[leanOptions]
+autoImplicit = false
+warningAsError = true
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.28.0"
+
+[[lean_lib]]
+name = "SDitH"

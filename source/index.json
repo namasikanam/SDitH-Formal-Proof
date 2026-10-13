@@ -1,0 +1,1296 @@
+{
+ "pdf": "sdith-v3.0.pdf",
+ "sha256": "22dfed06d179afa759139487dca9c8f8d4a7cfea22bcedcb7736b50ce5b01c83",
+ "algorithms": [
+  {
+   "algorithm": 1,
+   "title": "ExpandWitness",
+   "pdf_page": 13,
+   "printed_page": 11,
+   "status": "actual partial integer sampler feeds full post-sampling witness expansion at the concrete cipher-stream boundary; returned expansion weight/length, fuel stability and literal nonempty no-return proved; finite sampler/witness traces agree with successful Algorithm-6 outputs covering four bytes per attempt; PRG source gaps and complete source resolution remain explicit",
+   "specification": "SDitH/Spec/WitnessExpansion.lean",
+   "proof": "SDitH/Proofs/WitnessExpansion.lean",
+   "additional_proof": "SDitH/Proofs/WitnessConstraints.lean",
+   "partial_caller_specification": "SDitH/Spec/PartialKeyGeneration.lean",
+   "partial_caller_proof": "SDitH/Proofs/PartialKeyGeneration.lean",
+   "sampler_trace_specification": "SDitH/Spec/IntegerSamplingTrace.lean",
+   "sampler_trace_proof": "SDitH/Proofs/IntegerSamplingTrace.lean"
+  },
+  {
+   "algorithm": 2,
+   "title": "SD-in-the-Head-3 \u2013 Key Generation",
+   "pdf_page": 14,
+   "printed_page": 12,
+   "status": "independent uniform seed draws feed partial witness expansion, actual cipher-stream ExpandH, literal syndrome assignment and supplied serializers; exact returned-key provenance, generated-solution SD condition and separate missing-B/missing-x_A obstructions proved; typed and encoded observation PMFs assign zero mass to every literal returned key; finite PRG source gaps, raw codecs and complete key generation unresolved",
+   "specification": "SDitH/Spec/KeyGeneration.lean",
+   "proof": "SDitH/Proofs/KeyGeneration.lean",
+   "partial_caller_specification": "SDitH/Spec/PartialKeyGeneration.lean",
+   "partial_caller_proof": "SDitH/Proofs/PartialKeyGeneration.lean",
+   "sampler_trace_specification": "SDitH/Spec/IntegerSamplingTrace.lean",
+   "sampler_trace_proof": "SDitH/Proofs/IntegerSamplingTrace.lean"
+  },
+  {
+   "algorithm": 3,
+   "title": "SD-in-the-Head-3 \u2013 Signing Algorithm",
+   "pdf_page": 15,
+   "printed_page": 13,
+   "status": "actual BLC/PIOP prepared records feed partial hash and staged cipher opening callers; returned-signature provenance and outer-fuel stability checked; cipher expansion preserves separate material/MapToBits/Extract boundaries and reaches missing B after supplied earlier interpretations; initialization, codecs, source resolutions and full correctness/security unresolved",
+   "specification": "SDitH/Spec/Signing.lean",
+   "proof": "SDitH/Proofs/Signing.lean",
+   "additional_specification": "SDitH/Spec/SignatureComposition.lean",
+   "additional_proof": "SDitH/Proofs/SignatureComposition.lean",
+   "initialization_specification": "SDitH/Spec/KeyGeneration.lean",
+   "initialization_proof": "SDitH/Proofs/KeyGeneration.lean",
+   "partial_caller_specification": "SDitH/Spec/PartialSignature.lean",
+   "partial_caller_proof": "SDitH/Proofs/PartialSignature.lean",
+   "cipher_caller_specification": "SDitH/Spec/CipherSignature.lean",
+   "cipher_caller_proof": "SDitH/Proofs/CipherSignature.lean",
+   "shared_signing_specification": "SDitH/Spec/SharedSigning.lean",
+   "shared_signing_proof": "SDitH/Proofs/SharedSigning.lean",
+   "shared_game_invariant_proof": "SDitH/Proofs/SharedGameInvariant.lean",
+   "candidate_scheme_specification": "SDitH/Spec/CandidateScheme.lean",
+   "candidate_scheme_chain_proof": "SDitH/Proofs/CandidateSchemeChain.lean",
+   "candidate_simulator_specification": "SDitH/Spec/CandidateSimulator.lean",
+   "candidate_simulator_proof": "SDitH/Proofs/CandidateSimulator.lean",
+   "simulated_completeness_proof": "SDitH/Proofs/SimulatedCompleteness.lean",
+   "simulated_sign_proof": "SDitH/Proofs/SimulatedSign.lean",
+   "candidate_game_bounds_proof": "SDitH/Proofs/CandidateGameBounds.lean",
+   "game_event_bound_proof": "SDitH/Proofs/GameEventBound.lean",
+   "shared_target_bound_proof": "SDitH/Proofs/SharedTargetBound.lean",
+   "game_event_bound_len_proof": "SDitH/Proofs/GameEventBoundLen.lean",
+   "shared_mention_bound_proof": "SDitH/Proofs/SharedMentionBound.lean",
+   "cut_event_bound_proof": "SDitH/Proofs/CutEventBound.lean",
+   "shared_collision_bound_proof": "SDitH/Proofs/SharedCollisionBound.lean"
+  },
+  {
+   "algorithm": 4,
+   "title": "SD-in-the-Head-3 \u2013 Verification Algorithm",
+   "pdf_page": 16,
+   "printed_page": 14,
+   "status": "partial hash and staged cipher challenge/recomputation callers preserve source boundaries, pending, undefined and explicit rejection outcomes; actual cipher boundary/rejection provenance and missing-B obstructions checked at transmitted counter; independent supplied-base suffix composes PIOP, coefficient recovery and final hash; codecs, Algorithm-12 line 21 and complete correctness/security unresolved; verification is now an executed program on the shared hash/cipher/mask world (reconstruction, Hashaux, an explicit middle parameter for lines 9-21 of Algorithm 12, Hashlines, Algorithm-4 suffix), with the public oracle answering by component; forked accepted attempts share the typed hash input, and lifted digest programs evaluate against the digest projection; two successful executed verifications with equal lines digests and differing hidden indices determine a unique complete seed vector unless a digest collision or a recorded seed collision occurs",
+   "specification": "SDitH/Spec/SignatureComposition.lean",
+   "proof": "SDitH/Proofs/SignatureComposition.lean",
+   "coefficient_specification": "SDitH/Spec/CoefficientCompression.lean",
+   "coefficient_proof": "SDitH/Proofs/CoefficientCompression.lean",
+   "discrepancy_proof": "SDitH/Proofs/CoefficientDiscrepancy.lean",
+   "initialization_specification": "SDitH/Spec/KeyGeneration.lean",
+   "initialization_proof": "SDitH/Proofs/KeyGeneration.lean",
+   "partial_caller_specification": "SDitH/Spec/PartialSignature.lean",
+   "partial_caller_proof": "SDitH/Proofs/PartialSignature.lean",
+   "cipher_caller_specification": "SDitH/Spec/CipherSignature.lean",
+   "cipher_caller_proof": "SDitH/Proofs/CipherSignature.lean",
+   "shared_scheme_specification": "SDitH/Spec/SharedScheme.lean",
+   "shared_scheme_proof": "SDitH/Proofs/SharedScheme.lean",
+   "shared_scheme_chain_proof": "SDitH/Proofs/SharedSchemeChain.lean"
+  },
+  {
+   "algorithm": 5,
+   "title": "TweakSalt(salt, twk, b)",
+   "pdf_page": 18,
+   "printed_page": 16,
+   "status": "bit-level computation and recoverability proved",
+   "specification": "SDitH/Spec/DomainSeparation.lean",
+   "proof": "SDitH/Proofs/DomainSeparation.lean"
+  },
+  {
+   "algorithm": 6,
+   "title": "PRG(seed, salt, twk, nbytes )",
+   "pdf_page": 19,
+   "printed_page": 17,
+   "status": "partial literal transcription with explicit positive block-size parameter; actual cipher counter loop, complete-byte parse shape, least block count, prefix/reader/sampler correspondence and counter/tweak bounds proved; positive Category-III calls cannot satisfy the printed complete-Parse assignment; missing block-size value and present-salt/absent-tweak case remain unresolved",
+   "specification": "SDitH/Spec/PRG.lean",
+   "proof": "SDitH/Proofs/PRG.lean",
+   "additional_proofs": [
+    "SDitH/Proofs/PRGCounter.lean",
+    "SDitH/Proofs/PRGSampling.lean"
+   ],
+   "earlier_width_discrepancy": "SDitH/Proofs/ParameterChecks.lean"
+  },
+  {
+   "algorithm": 7,
+   "title": "BAVC.Commit",
+   "pdf_page": 24,
+   "printed_page": 22,
+   "status": "full construction at explicit cipher/hash boundary; tree loop and recursive characterization proved; fixed-width serialization injectivity and computable two-layer collision finder checked; probabilistic hiding/binding unfinished",
+   "specification": "SDitH/Spec/BAVC.lean",
+   "proof": "SDitH/Proofs/BAVC.lean"
+  },
+  {
+   "algorithm": 8,
+   "title": "BAVC.Open",
+   "pdf_page": 25,
+   "printed_page": 23,
+   "status": "literal queue computation, termination, legal-input memory/queue safety, padded length and concrete trace proved; reveal correctness unfinished",
+   "specification": "SDitH/Spec/BAVCOpening.lean",
+   "proof": "SDitH/Proofs/BAVCOpening.lean"
+  },
+  {
+   "algorithm": 9,
+   "title": "BAVC.Reconstruct",
+   "pdf_page": 26,
+   "printed_page": 24,
+   "status": "full staged typed-input body; queue/loop/output and missing-binding properties proved; Category-I opening explicitly rejected for every nodes binding. Instrumented rows refine this exact body. Equal-root successful reconstructions with differing commonly revealed seeds yield a computed actual hash collision or same-index seed-commitment collision. No probabilistic binding, source correction or intended reveal correctness claimed",
+   "specification": "SDitH/Spec/BAVCReconstruction.lean",
+   "proof": "SDitH/Proofs/BAVCReconstruction.lean",
+   "additional_proof": "SDitH/Proofs/BAVCPrefill.lean",
+   "opening_trace": "SDitH/Proofs/BAVCTrace.lean",
+   "candidate_target_specification": "SDitH/Spec/CandidateBAVC.lean",
+   "candidate_target_proof": "SDitH/Proofs/CandidateBAVC.lean",
+   "candidate_completeness_proof": "SDitH/Proofs/CandidateCompleteness.lean"
+  },
+  {
+   "algorithm": 10,
+   "title": "BLC.Commit",
+   "pdf_page": 30,
+   "printed_page": 28,
+   "status": "composed BAVC seed tree, sampling, Gray folding/corrections, typed hashes, consistency matrix and lines; concrete AES/Rijndael/SHAKE and cipher-stream primitive family added, with successful finite PRG correspondence and submitted tweak ranges proved; structured serialization, Category-III PRG parse and recomputation integration remain unresolved",
+   "specification": "SDitH/Spec/BLCArithmetic.lean",
+   "proof": "SDitH/Proofs/BLCArithmetic.lean",
+   "hidden_share_translation_proof": "SDitH/Proofs/HiddenShareTranslation.lean",
+   "correction_translation_proof": "SDitH/Proofs/CorrectionTranslation.lean",
+   "correction_uniform_proof": "SDitH/Proofs/CorrectionUniform.lean",
+   "joint_pads_proof": "SDitH/Proofs/JointPads.lean",
+   "revealed_bijection_proof": "SDitH/Proofs/RevealedBijection.lean",
+   "view_bijection_proof": "SDitH/Proofs/ViewBijection.lean",
+   "honest_view_uniform_proof": "SDitH/Proofs/HonestViewUniform.lean",
+   "prg_hypothesis_proof": "SDitH/Proofs/PRGHypothesis.lean",
+   "signature_data_proof": "SDitH/Proofs/SignatureData.lean",
+   "prepared_data_proof": "SDitH/Proofs/PreparedData.lean",
+   "prepared_honest_data_proof": "SDitH/Proofs/PreparedHonestData.lean",
+   "data_simulation_proof": "SDitH/Proofs/DataSimulation.lean",
+   "transcript_revealed_proof": "SDitH/Proofs/TranscriptRevealed.lean",
+   "additional_proof": "SDitH/Proofs/ConcreteEncodings.lean",
+   "encoding_status": "actual psi injectivity and concrete field instances proved for all Table-2 quotients; binary/Gray merged points agree iff every index is 0 or 1, while zero tests, images and uniform-index laws agree; image cardinality and both-table size conditions proved; source encoding selection and full integration unresolved",
+   "composition_specification": "SDitH/Spec/BLCCommit.lean",
+   "composition_proof": "SDitH/Proofs/BLCCommit.lean",
+   "concrete_specification": "SDitH/Spec/ConcreteBLC.lean",
+   "concrete_proof": "SDitH/Proofs/ConcreteBLC.lean",
+   "shared_signer_specification": "SDitH/Spec/SharedSigner.lean",
+   "shared_signer_proof": "SDitH/Proofs/SharedSigner.lean"
+  },
+  {
+   "algorithm": 11,
+   "title": "BLC.OpenRandomEvaluation",
+   "pdf_page": 31,
+   "printed_page": 29,
+   "status": "actual BAVC retry now accepts full staged cipher expansion with source boundaries preserved at the same counter; refinement to prior partial interface, successful expansion/opening/header provenance and stable returns proved; literal cipher caller stops at material parse, and resolved earlier stages still reach missing B; source repairs, source overflow policy and full security unresolved",
+   "specification": "SDitH/Spec/PartialBLCRetry.lean",
+   "proof": "SDitH/Proofs/PartialBLCRetry.lean",
+   "total_interface_specification": "SDitH/Spec/BLCRetry.lean",
+   "total_interface_proof": "SDitH/Proofs/BLCRetry.lean",
+   "encoding_specification": "SDitH/Spec/ChallengeEncoding.lean",
+   "encoding_proof": "SDitH/Proofs/ChallengeEncoding.lean",
+   "partial_caller_specification": "SDitH/Spec/PartialSignature.lean",
+   "partial_caller_proof": "SDitH/Proofs/PartialSignature.lean",
+   "cipher_caller_specification": "SDitH/Spec/CipherSignature.lean",
+   "cipher_caller_proof": "SDitH/Proofs/CipherSignature.lean",
+   "cipher_retry_specification": "SDitH/Spec/CipherBLCRetry.lean",
+   "cipher_retry_proof": "SDitH/Proofs/CipherBLCRetry.lean"
+  },
+  {
+   "algorithm": 12,
+   "title": "BLC.RecomputeEvaluation",
+   "pdf_page": 32,
+   "printed_page": 30,
+   "status": "staged prefix through line 20 and separate suffix lines 22-27; actual reconstruction, PRG sampling, ordered folds and consistency expansion. Actual Hashlines/Hashaux query pairs give equal BAVC roots or explicit hash collisions for two successful prepared prefixes and supplied-base suffixes. The verifier's Aux/Lines chain is now an explicit oracle program composed after the complete ordered Algorithm-9 reconstruction on the shared hash/cipher model; two selected executions with equal line digests and a disagreeing commonly revealed seed have a proved full/III collision bound including both chains' queries. No serializer injectivity assumed; missing bindings, line 21 and omitted witness-correction field remain unresolved; no complete recomputation/full binding claimed; two successful chains with equal line digests and different hidden indices at an execution determine a unique complete leaf-seed vector for it, computed by pointwise merge, except on the bounded disagreement event; under explicit extractor bindings (seed array from a complete seed vector, zero initial shares, Gray phi_mu) the lines 9-16 fold at any hidden index is an affine function of its Gray row with slope/intercept computed from the seed vector and transmitted corrections; the honest Algorithm-10 corrections give the committed common accumulator as slope; the suffix witness/randomness values under those bindings split into per-execution slope terms and the intercept psi, with constant slope giving an affine-in-delta value; under an explicit candidate binary reading of line 21, two hidden vectors differing at one Gray bit force the masked slope to equal the transmitted plain check; over a uniformly sampled binary mask, a fixed nonzero vector is annihilated by [I|M] with probability at most 2^-(lambda+B), so two distinct fixed slopes have equal masked images with at most that probability; the concrete XOF correspondence of the mask is separate; an adaptive procedure querying a lazy mask oracle sees a mask annihilating the fixed nonzero vector of its own query input with probability at most budget*2^-(lambda+B), with repeated queries unable to create a new hit; the trap bound also holds for predicates depending on the oracle table before each fresh query, with the fresh-entry/table correspondence and monotone table growth proved; a fresh oracle answer equals a value mentioned by an earlier fresh query input with probability at most choose(budget,2)*m/|Output| for mention sets of size at most m, via a prefix-dependent trap bound summing a per-position epsilon; hash and mask oracles are modeled as the digest and matrix components of one product-valued lazy oracle, with the table-dependent mask trap bound budget*2^-(lambda+B) and the digest mention bound choose(budget,2)*m/|Digest| transferred to the components; the instrumented oracle log is ordered and fresh, and a stored dependency chain of hash queries is either fully present in the table before its sink was answered or a fresh digest hit a mentioned value; the concrete row/outer/auxiliary strings and the mask input are pairwise distinct with a fixed-offset digest-window mention parser of size at most tau+2, so for every execution the chain is present before the mask input was answered or a fresh digest hit a mentioned value; in a digest-collision-free table two chained claims with one auxiliary digest agree on salt, seeds, row digests, root and corrections under explicit injective commitment/serializer hypotheses, and the digest-collision event is bounded by choose(budget,2)/|Digest| with stored collisions raising it; the standalone slope-consistency game on the product-valued oracle is bounded by tau^2*budget*2^-s + choose(budget,2)*(tau+3)/2^(2*lambda) under explicit injective commitment/serializer hypotheses; the shared hash/cipher execution is instrumented with the fresh-query log, projects exactly onto the existing shared execution, keeps the traced/ordered/fresh invariants, and carries both the table-dependent and prefix-dependent trap bounds, also over the hidden cipher family; under the posterior cipher law a key with both paired inputs unobserved matches two target outputs with probability at most 1/(M-q)*1/(M-(q+1)), and some such key among k candidates with at most k times that, the ideal-cipher step for a seed collision against an unqueried seed; in the shared hash/cipher model with CommitSeed through the hidden family, a winning slope-inconsistency run raised a mask trap, the mention event, the digest-collision event, a witnessed pair collision among queried seeds, or an unqueried seed matching a named seed's commitment; the shared-model slope-consistency bound is tau^2*budget*2^-s + choose(budget,2)*(tau+3)/2^(2*lambda) + choose(budget,2)*pairCost + tau*2^kappa*2^lambda/((2^lambda-budget)(2^lambda-budget-1)), with the named claim's commitment calls required in the cipher history; the instrumented two-phase shared execution projects exactly onto the existing one, keeps the log invariants, has at most q+k fresh entries and carries both trap bounds with total budget q+k; with the named claim's commitment calls executed as a second phase, the slope-consistency bound holds with budget q+2*tau*2^kappa and no queried condition; a named candidate middle (seed := reconstruction's revealed seeds, rshare := 0, phi_mu := Gray, mask from the oracle, line 21 as the binary base equation) is proved to produce the affine share matrix of any complete seed vector agreeing with the revealed seeds, with its base equal to the masked-slope form",
+   "specification": "SDitH/Spec/BLCRecompute.lean",
+   "proof": "SDitH/Proofs/BLCRecompute.lean",
+   "additional_specification": "SDitH/Spec/BLCRetry.lean",
+   "additional_proof": "SDitH/Proofs/BLCRetry.lean",
+   "displayed_arithmetic_specification": "SDitH/Spec/BLCArithmetic.lean",
+   "displayed_arithmetic_proof": "SDitH/Proofs/BLCArithmetic.lean",
+   "partial_caller_specification": "SDitH/Spec/PartialSignature.lean",
+   "partial_caller_proof": "SDitH/Proofs/PartialSignature.lean",
+   "cipher_caller_specification": "SDitH/Spec/CipherSignature.lean",
+   "cipher_caller_proof": "SDitH/Proofs/CipherSignature.lean",
+   "chain_specification": "SDitH/Spec/BLCHashChain.lean",
+   "chain_proof": "SDitH/Proofs/BLCHashChain.lean",
+   "chain_game_specification": "SDitH/Spec/BLCReconstructionChain.lean",
+   "chain_game_proof": "SDitH/Proofs/BLCReconstructionChain.lean",
+   "seed_extraction_specification": "SDitH/Spec/BLCSeedExtraction.lean",
+   "seed_extraction_proof": "SDitH/Proofs/BLCSeedExtraction.lean",
+   "seed_fold_specification": "SDitH/Spec/BLCSeedFold.lean",
+   "seed_fold_proof": "SDitH/Proofs/BLCSeedFold.lean",
+   "seed_lines_specification": "SDitH/Spec/BLCSeedLines.lean",
+   "seed_lines_proof": "SDitH/Proofs/BLCSeedLines.lean",
+   "consistency_matrix_specification": "SDitH/Spec/ConsistencyMatrix.lean",
+   "consistency_matrix_proof": "SDitH/Proofs/ConsistencyMatrix.lean",
+   "oracle_trap_specification": "SDitH/Spec/RandomOracleTrap.lean",
+   "oracle_trap_proof": "SDitH/Proofs/RandomOracleTrap.lean",
+   "fresh_hash_uniform_proof": "SDitH/Proofs/FreshHashUniform.lean",
+   "public_hash_fresh_proof": "SDitH/Proofs/PublicHashFresh.lean",
+   "public_mask_fresh_proof": "SDitH/Proofs/PublicMaskFresh.lean",
+   "single_step_runs_proof": "SDitH/Proofs/SingleStepRuns.lean",
+   "run_fuel_proof": "SDitH/Proofs/RunFuel.lean",
+   "run_bind_proof": "SDitH/Proofs/RunBind.lean",
+   "commit_decomposition_proof": "SDitH/Proofs/CommitDecomposition.lean",
+   "commit_split_run_proof": "SDitH/Proofs/CommitSplitRun.lean",
+   "tail_lines_digest_proof": "SDitH/Proofs/TailLinesDigest.lean",
+   "lines_mention_proof": "SDitH/Proofs/LinesMention.lean",
+   "query_prefixes_proof": "SDitH/Proofs/QueryPrefixes.lean",
+   "three_hash_run_proof": "SDitH/Proofs/ThreeHashRun.lean",
+   "three_hash_shape_proof": "SDitH/Proofs/ThreeHashShape.lean",
+   "stored_lines_mention_proof": "SDitH/Proofs/StoredLinesMention.lean",
+   "prefix_lines_fresh_proof": "SDitH/Proofs/PrefixLinesFresh.lean",
+   "prefix_head_split_proof": "SDitH/Proofs/PrefixHeadSplit.lean",
+   "prefix_lines_fresh_run_proof": "SDitH/Proofs/PrefixLinesFreshRun.lean",
+   "chain_fresh_proof": "SDitH/Proofs/ChainFresh.lean",
+   "collect_last_proof": "SDitH/Proofs/CollectLast.lean",
+   "outer_fresh_proof": "SDitH/Proofs/OuterFresh.lean",
+   "head_last_split_proof": "SDitH/Proofs/HeadLastSplit.lean",
+   "head_last_run_proof": "SDitH/Proofs/HeadLastRun.lean",
+   "trace_suffix_proof": "SDitH/Proofs/TraceSuffix.lean",
+   "prefix_tail_or_mention_proof": "SDitH/Proofs/PrefixTailOrMention.lean",
+   "prefix_or_mention_proof": "SDitH/Proofs/PrefixOrMention.lean",
+   "commit_lines_event_proof": "SDitH/Proofs/CommitLinesEvent.lean",
+   "prefix_mention_bound_proof": "SDitH/Proofs/PrefixMentionBound.lean",
+   "prefix_from_head_proof": "SDitH/Proofs/PrefixFromHead.lean",
+   "commit_lines_events_proof": "SDitH/Proofs/CommitLinesEvents.lean",
+   "sign_step_proof": "SDitH/Proofs/SignStep.lean",
+   "sign_compare_proof": "SDitH/Proofs/SignCompare.lean",
+   "simulated_with_proof": "SDitH/Proofs/SimulatedWith.lean",
+   "digest_first_body_proof": "SDitH/Proofs/DigestFirstBody.lean",
+   "digest_first_vs_simulated_proof": "SDitH/Proofs/DigestFirstVsSimulated.lean",
+   "honest_to_simulated_proof": "SDitH/Proofs/HonestToSimulated.lean",
+   "sign_compare_post_proof": "SDitH/Proofs/SignComparePost.lean",
+   "run_hybrid_proof": "SDitH/Proofs/RunHybrid.lean",
+   "cut_hybrid_proof": "SDitH/Proofs/CutHybrid.lean",
+   "event_hybrid_proof": "SDitH/Proofs/EventHybrid.lean",
+   "simulation_gap_proof": "SDitH/Proofs/SimulationGap.lean",
+   "forgery_bound_explicit_proof": "SDitH/Proofs/ForgeryBoundExplicit.lean",
+   "table_support_proof": "SDitH/Proofs/TableSupport.lean",
+   "run_hybrid_inv_proof": "SDitH/Proofs/RunHybridInv.lean",
+   "cut_hybrid_inv_proof": "SDitH/Proofs/CutHybridInv.lean",
+   "simulation_gap_inv_proof": "SDitH/Proofs/SimulationGapInv.lean",
+   "run_hybrid_gen_proof": "SDitH/Proofs/RunHybridGen.lean",
+   "cut_hybrid_gen_proof": "SDitH/Proofs/CutHybridGen.lean",
+   "simulation_gap_gen_proof": "SDitH/Proofs/SimulationGapGen.lean",
+   "hit_count_proof": "SDitH/Proofs/HitCount.lean",
+   "input_present_tail_proof": "SDitH/Proofs/InputPresentTail.lean",
+   "input_present_bound_proof": "SDitH/Proofs/InputPresentBound.lean",
+   "new_mention_proof": "SDitH/Proofs/NewMention.lean",
+   "new_mention_chain_proof": "SDitH/Proofs/NewMentionChain.lean",
+   "new_mention_prefix_proof": "SDitH/Proofs/NewMentionPrefix.lean",
+   "input_present_uniform_proof": "SDitH/Proofs/InputPresentUniform.lean",
+   "trace_length_proof": "SDitH/Proofs/TraceLength.lean",
+   "trace_growth_proof": "SDitH/Proofs/TraceGrowth.lean",
+   "simulation_gap_trace_proof": "SDitH/Proofs/SimulationGapTrace.lean",
+   "payload_bridge_proof": "SDitH/Proofs/PayloadBridge.lean",
+   "constant_term_zero_proof": "SDitH/Proofs/ConstantTermZero.lean",
+   "payload_consistent_proof": "SDitH/Proofs/PayloadConsistent.lean",
+   "forgery_bound_trace_proof": "SDitH/Proofs/ForgeryBoundTrace.lean",
+   "cipher_resample_proof": "SDitH/Proofs/CipherResample.lean",
+   "game_resample_proof": "SDitH/Proofs/GameResample.lean",
+   "charge_run_proof": "SDitH/Proofs/ChargeRun.lean",
+   "charge_expect_proof": "SDitH/Proofs/ChargeExpect.lean",
+   "charge_cut_proof": "SDitH/Proofs/ChargeCut.lean",
+   "charge_cut_expect_proof": "SDitH/Proofs/ChargeCutExpect.lean",
+   "shared_resample_proof": "SDitH/Proofs/SharedResample.lean",
+   "candidate_resample_proof": "SDitH/Proofs/CandidateResample.lean",
+   "simulation_gap_mean_proof": "SDitH/Proofs/SimulationGapMean.lean",
+   "forgery_bound_mean_proof": "SDitH/Proofs/ForgeryBoundMean.lean",
+   "posterior_fresh_proof": "SDitH/Proofs/PosteriorFresh.lean",
+   "head_commit_split_proof": "SDitH/Proofs/HeadCommitSplit.lean",
+   "rows_support_proof": "SDitH/Proofs/RowsSupport.lean",
+   "row_stored_reduce_proof": "SDitH/Proofs/RowStoredReduce.lean",
+   "row_stored_count_proof": "SDitH/Proofs/RowStoredCount.lean",
+   "row_stored_after_proof": "SDitH/Proofs/RowStoredAfter.lean",
+   "row_stored_posterior_proof": "SDitH/Proofs/RowStoredPosterior.lean",
+   "tree_run_entries_proof": "SDitH/Proofs/TreeRunEntries.lean",
+   "tree_step_fresh_proof": "SDitH/Proofs/TreeStepFresh.lean",
+   "tree_good_induction_proof": "SDitH/Proofs/TreeGoodInduction.lean",
+   "commit_entries_proof": "SDitH/Proofs/CommitEntries.lean",
+   "stale_not_good_proof": "SDitH/Proofs/StaleNotGood.lean",
+   "stale_term_bound_proof": "SDitH/Proofs/StaleTermBound.lean",
+   "row_bound_explicit_proof": "SDitH/Proofs/RowBoundExplicit.lean",
+   "cipher_invariant_proof": "SDitH/Proofs/CipherInvariant.lean",
+   "simulation_gap_cipher_proof": "SDitH/Proofs/SimulationGapCipher.lean",
+   "mean_hybrid_proof": "SDitH/Proofs/MeanHybrid.lean",
+   "run_world_proof": "SDitH/Proofs/RunWorld.lean",
+   "candidate_prep_law_proof": "SDitH/Proofs/CandidatePrepLaw.lean",
+   "hidden_entries_proof": "SDitH/Proofs/HiddenEntries.lean",
+   "posterior_prune_proof": "SDitH/Proofs/PosteriorPrune.lean",
+   "pruned_run_proof": "SDitH/Proofs/PrunedRun.lean",
+   "pruned_run_reverse_proof": "SDitH/Proofs/PrunedRunReverse.lean",
+   "shared_prune_proof": "SDitH/Proofs/SharedPrune.lean",
+   "game_prune_proof": "SDitH/Proofs/GamePrune.lean",
+   "prune_law_run_proof": "SDitH/Proofs/PruneLawRun.lean",
+   "candidate_prune_proof": "SDitH/Proofs/CandidatePrune.lean",
+   "candidate_game_prune_proof": "SDitH/Proofs/CandidateGamePrune.lean",
+   "hidden_keys_proof": "SDitH/Proofs/HiddenKeys.lean",
+   "node_exchange_proof": "SDitH/Proofs/NodeExchange.lean",
+   "tree_exchange_proof": "SDitH/Proofs/TreeExchange.lean",
+   "tree_run_closed_proof": "SDitH/Proofs/TreeRunClosed.lean",
+   "tree_history_exchange_proof": "SDitH/Proofs/TreeHistoryExchange.lean",
+   "run_congr_proof": "SDitH/Proofs/RunCongr.lean",
+   "commit_phase_exchange_proof": "SDitH/Proofs/CommitPhaseExchange.lean",
+   "run_history_shift_proof": "SDitH/Proofs/RunHistoryShift.lean",
+   "commit_run_exchange_proof": "SDitH/Proofs/CommitRunExchange.lean",
+   "commit_pruned_proof": "SDitH/Proofs/CommitPruned.lean",
+   "commit_view_exchange_proof": "SDitH/Proofs/CommitViewExchange.lean",
+   "honest_view_exchange_proof": "SDitH/Proofs/HonestViewExchange.lean",
+   "fiber_counting_proof": "SDitH/Proofs/FiberCounting.lean",
+   "fiber_counting_bad_proof": "SDitH/Proofs/FiberCountingBad.lean",
+   "fiber_counting_sided_proof": "SDitH/Proofs/FiberCountingSided.lean",
+   "run_keys_proof": "SDitH/Proofs/RunKeys.lean",
+   "commit_history_keys_proof": "SDitH/Proofs/CommitHistoryKeys.lean",
+   "hidden_keys_exchange_proof": "SDitH/Proofs/HiddenKeysExchange.lean",
+   "own_view_exchange_proof": "SDitH/Proofs/OwnViewExchange.lean",
+   "posterior_node_bound_proof": "SDitH/Proofs/PosteriorNodeBound.lean",
+   "honest_node_bound_proof": "SDitH/Proofs/HonestNodeBound.lean",
+   "key_weight_sum_proof": "SDitH/Proofs/KeyWeightSum.lean",
+   "node_touch_bound_proof": "SDitH/Proofs/NodeTouchBound.lean",
+   "path_union_proof": "SDitH/Proofs/PathUnion.lean",
+   "tree_distinct_proof": "SDitH/Proofs/TreeDistinct.lean",
+   "sibling_keys_proof": "SDitH/Proofs/SiblingKeys.lean",
+   "tree_distinct_bound_proof": "SDitH/Proofs/TreeDistinctBound.lean",
+   "distinct_bridge_proof": "SDitH/Proofs/DistinctBridge.lean",
+   "root_exchange_proof": "SDitH/Proofs/RootExchange.lean",
+   "product_swap_proof": "SDitH/Proofs/ProductSwap.lean",
+   "root_history_exchange_proof": "SDitH/Proofs/RootHistoryExchange.lean",
+   "key_swap_proof": "SDitH/Proofs/KeySwap.lean",
+   "root_commit_run_proof": "SDitH/Proofs/RootCommitRun.lean",
+   "root_commit_view_proof": "SDitH/Proofs/RootCommitView.lean",
+   "root_own_view_proof": "SDitH/Proofs/RootOwnView.lean",
+   "root_posterior_bound_proof": "SDitH/Proofs/RootPosteriorBound.lean",
+   "root_honest_bound_proof": "SDitH/Proofs/RootHonestBound.lean",
+   "root_touch_bound_proof": "SDitH/Proofs/RootTouchBound.lean",
+   "hidden_tuple_proof": "SDitH/Proofs/HiddenTuple.lean",
+   "hidden_slice_proof": "SDitH/Proofs/HiddenSlice.lean",
+   "own_view_exchange_gen_proof": "SDitH/Proofs/OwnViewExchangeGen.lean",
+   "hidden_keys_all_exchange_proof": "SDitH/Proofs/HiddenKeysAllExchange.lean",
+   "own_view_exchange_all_proof": "SDitH/Proofs/OwnViewExchangeAll.lean",
+   "view_node_bound_proof": "SDitH/Proofs/ViewNodeBound.lean",
+   "view_root_bound_proof": "SDitH/Proofs/ViewRootBound.lean",
+   "all_view_bounds_proof": "SDitH/Proofs/AllViewBounds.lean",
+   "touch_split_proof": "SDitH/Proofs/TouchSplit.lean",
+   "touch_assembly_proof": "SDitH/Proofs/TouchAssembly.lean",
+   "touch_total_proof": "SDitH/Proofs/TouchTotal.lean",
+   "tree_of_matches_proof": "SDitH/Proofs/TreeOfMatches.lean",
+   "commit_history_contains_proof": "SDitH/Proofs/CommitHistoryContains.lean",
+   "sign_bridge_proof": "SDitH/Proofs/SignBridge.lean",
+   "charge_run_cont_proof": "SDitH/Proofs/ChargeRunCont.lean",
+   "charge_cut_cont_proof": "SDitH/Proofs/ChargeCutCont.lean",
+   "simulation_gap_cont_proof": "SDitH/Proofs/SimulationGapCont.lean",
+   "game_prune_reverse_proof": "SDitH/Proofs/GamePruneReverse.lean",
+   "candidate_game_prune_reverse_proof": "SDitH/Proofs/CandidateGamePruneReverse.lean",
+   "mean_hybrid_cont_proof": "SDitH/Proofs/MeanHybridCont.lean",
+   "history_shift_game_proof": "SDitH/Proofs/HistoryShiftGame.lean",
+   "candidate_shift_proof": "SDitH/Proofs/CandidateShift.lean",
+   "fork_restore_proof": "SDitH/Proofs/ForkRestore.lean",
+   "fork_restore_lemmas_proof": "SDitH/Proofs/ForkRestoreLemmas.lean",
+   "fork_restore_shift_proof": "SDitH/Proofs/ForkRestoreShift.lean",
+   "fork_restore_eq_proof": "SDitH/Proofs/ForkRestoreEq.lean",
+   "mean_hybrid_cont_w_proof": "SDitH/Proofs/MeanHybridContW.lean",
+   "fork_restore_end_proof": "SDitH/Proofs/ForkRestoreEnd.lean",
+   "event_restore_proof": "SDitH/Proofs/EventRestore.lean",
+   "mean_fork_cont_proof": "SDitH/Proofs/MeanForkCont.lean",
+   "mean_fork_cont2_proof": "SDitH/Proofs/MeanForkCont2.lean",
+   "mean_event_cont_proof": "SDitH/Proofs/MeanEventCont.lean",
+   "candidate_keeps_family_proof": "SDitH/Proofs/CandidateKeepsFamily.lean",
+   "invc_extra_proof": "SDitH/Proofs/InvCExtra.lean",
+   "forgery_events_proof": "SDitH/Proofs/ForgeryEvents.lean",
+   "simulation_gap_mean2_proof": "SDitH/Proofs/SimulationGapMean2.lean",
+   "game_prune_gen_proof": "SDitH/Proofs/GamePruneGen.lean",
+   "prune_compat_closure_proof": "SDitH/Proofs/PruneCompatClosure.lean",
+   "fork_prune_compat_proof": "SDitH/Proofs/ForkPruneCompat.lean",
+   "mean_hybrid_compat_proof": "SDitH/Proofs/MeanHybridCompat.lean",
+   "cut_world_proof": "SDitH/Proofs/CutWorld.lean",
+   "mean_cut_compat_proof": "SDitH/Proofs/MeanCutCompat.lean",
+   "event_cut_compat_proof": "SDitH/Proofs/EventCutCompat.lean",
+   "swap_discharge_proof": "SDitH/Proofs/SwapDischarge.lean",
+   "simulation_gap_compat_proof": "SDitH/Proofs/SimulationGapCompat.lean",
+   "touch_const_proof": "SDitH/Proofs/TouchConst.lean",
+   "touch_prep_proof": "SDitH/Proofs/TouchPrep.lean",
+   "touch_identity_proof": "SDitH/Proofs/TouchIdentity.lean",
+   "touch_bound_proof": "SDitH/Proofs/TouchBound.lean",
+   "forgery_final_proof": "SDitH/Proofs/ForgeryFinal.lean",
+   "event_requirements_proof": "SDitH/Proofs/EventRequirements.lean",
+   "swap_close_proof": "SDitH/Proofs/SwapClose.lean",
+   "swap_close_split_proof": "SDitH/Proofs/SwapCloseSplit.lean",
+   "hit_term_proof": "SDitH/Proofs/HitTerm.lean",
+   "program_relabel_proof": "SDitH/Proofs/ProgramRelabel.lean",
+   "commit_phase_leaf_proof": "SDitH/Proofs/CommitPhaseLeaf.lean",
+   "commit_run_leaf_proof": "SDitH/Proofs/CommitRunLeaf.lean",
+   "phase_view_leaf_proof": "SDitH/Proofs/PhaseViewLeaf.lean",
+   "honest_leaf_bound_proof": "SDitH/Proofs/HonestLeafBound.lean",
+   "phase_view_leaf_all_proof": "SDitH/Proofs/PhaseViewLeafAll.lean",
+   "leaf_exchange_distinct_proof": "SDitH/Proofs/LeafExchangeDistinct.lean",
+   "leaf_joint_bound_proof": "SDitH/Proofs/LeafJointBound.lean",
+   "leaf_block_bound_proof": "SDitH/Proofs/LeafBlockBound.lean",
+   "leaf_mixture_proof": "SDitH/Proofs/LeafMixture.lean",
+   "tail_run_proof": "SDitH/Proofs/TailRun.lean",
+   "signing_data_proof": "SDitH/Proofs/SigningData.lean",
+   "sliced_invariance_proof": "SDitH/Proofs/SlicedInvariance.lean",
+   "leaf_mixture_gen_proof": "SDitH/Proofs/LeafMixtureGen.lean",
+   "off_hit_setup_proof": "SDitH/Proofs/OffHitSetup.lean",
+   "off_hit_chain_proof": "SDitH/Proofs/OffHitChain.lean",
+   "tuple_of_digest_proof": "SDitH/Proofs/TupleOfDigest.lean",
+   "off_hit_assembly_proof": "SDitH/Proofs/OffHitAssembly.lean",
+   "off_hit_close_proof": "SDitH/Proofs/OffHitClose.lean",
+   "forgery_data_proof": "SDitH/Proofs/ForgeryData.lean",
+   "leaf_sliced_proof": "SDitH/Proofs/LeafSliced.lean",
+   "leaf_term_bound_proof": "SDitH/Proofs/LeafTermBound.lean",
+   "forgery_hide_proof": "SDitH/Proofs/ForgeryHide.lean",
+   "pair_mass_proof": "SDitH/Proofs/PairMass.lean",
+   "pair_oracles_proof": "SDitH/Proofs/PairOracles.lean",
+   "pair_run_proof": "SDitH/Proofs/PairRun.lean",
+   "pair_fork_proof": "SDitH/Proofs/PairFork.lean",
+   "seed_collision_witness_proof": "SDitH/Proofs/SeedCollisionWitness.lean",
+   "seed_collision_bound_proof": "SDitH/Proofs/SeedCollisionBound.lean",
+   "forgery_coll_proof": "SDitH/Proofs/ForgeryColl.lean",
+   "slope_event_setting_proof": "SDitH/Proofs/SlopeEventSetting.lean",
+   "slope_chain_fork_proof": "SDitH/Proofs/SlopeChainFork.lean",
+   "slope_cover_fork_proof": "SDitH/Proofs/SlopeCoverFork.lean",
+   "slope_trap_bound_proof": "SDitH/Proofs/SlopeTrapBound.lean",
+   "pair_fork_family_proof": "SDitH/Proofs/PairForkFamily.lean",
+   "fork_witnessed_bound_proof": "SDitH/Proofs/ForkWitnessedBound.lean",
+   "fork_unseen_bound_proof": "SDitH/Proofs/ForkUnseenBound.lean",
+   "slope_chain_reduction_proof": "SDitH/Proofs/SlopeChainReduction.lean",
+   "forgery_slope_proof": "SDitH/Proofs/ForgerySlope.lean",
+   "mux_select_proof": "SDitH/Proofs/MuxSelect.lean",
+   "solution_regular_proof": "SDitH/Proofs/SolutionRegular.lean",
+   "forgery_rsd_proof": "SDitH/Proofs/ForgeryRSD.lean",
+   "named_simulator_terms_proof": "SDitH/Proofs/NamedSimulatorTerms.lean",
+   "oracle_trace_specification": "SDitH/Spec/RandomOracleTrace.lean",
+   "oracle_trace_proof": "SDitH/Proofs/RandomOracleTrace.lean",
+   "oracle_mention_specification": "SDitH/Spec/RandomOracleMention.lean",
+   "oracle_mention_proof": "SDitH/Proofs/RandomOracleMention.lean",
+   "product_oracle_specification": "SDitH/Spec/ProductOracle.lean",
+   "product_oracle_proof": "SDitH/Proofs/ProductOracle.lean",
+   "oracle_chain_specification": "SDitH/Spec/OracleChain.lean",
+   "oracle_chain_proof": "SDitH/Proofs/OracleChain.lean",
+   "chain_inputs_specification": "SDitH/Spec/BAVCChainInputs.lean",
+   "chain_inputs_proof": "SDitH/Proofs/BAVCChainInputs.lean",
+   "slope_consistency_specification": "SDitH/Spec/SlopeConsistency.lean",
+   "slope_consistency_proof": "SDitH/Proofs/SlopeConsistency.lean",
+   "slope_game_specification": "SDitH/Spec/SlopeConsistencyGame.lean",
+   "slope_game_proof": "SDitH/Proofs/SlopeConsistencyGame.lean",
+   "hash_cipher_trace_specification": "SDitH/Spec/HashCipherTrace.lean",
+   "hash_cipher_trace_proof": "SDitH/Proofs/HashCipherTrace.lean",
+   "unseen_match_proof": "SDitH/Proofs/IdealCipherUnseenMatch.lean",
+   "fresh_key_uniform_proof": "SDitH/Proofs/FreshKeyUniform.lean",
+   "leaf_seed_uniform_proof": "SDitH/Proofs/LeafSeedUniform.lean",
+   "truncated_layout_uniform_proof": "SDitH/Proofs/TruncatedLayoutUniform.lean",
+   "posterior_leaf_uniform_proof": "SDitH/Proofs/PosteriorLeafUniform.lean",
+   "hidden_leaf_node_proof": "SDitH/Proofs/HiddenLeafNode.lean",
+   "tree_entries_proof": "SDitH/Proofs/TreeEntries.lean",
+   "hidden_share_step_proof": "SDitH/Proofs/HiddenShareStep.lean",
+   "fresh_key_probability_proof": "SDitH/Proofs/FreshKeyProbability.lean",
+   "layout_key_injective_proof": "SDitH/Proofs/LayoutKeyInjective.lean",
+   "shared_slope_game_specification": "SDitH/Spec/SharedSlopeGame.lean",
+   "shared_slope_game_proof": "SDitH/Proofs/SharedSlopeGame.lean",
+   "shared_slope_bound_proof": "SDitH/Proofs/SharedSlopeBound.lean",
+   "trace_pipeline_specification": "SDitH/Spec/HashCipherTracePipeline.lean",
+   "trace_pipeline_proof": "SDitH/Proofs/HashCipherTracePipeline.lean",
+   "shared_slope_exec_specification": "SDitH/Spec/SharedSlopeExec.lean",
+   "shared_slope_exec_proof": "SDitH/Proofs/SharedSlopeExec.lean",
+   "candidate_verifier_specification": "SDitH/Spec/CandidateVerifier.lean",
+   "candidate_verifier_proof": "SDitH/Proofs/CandidateVerifier.lean",
+   "honest_candidate_proof": "SDitH/Proofs/HonestCandidate.lean",
+   "fork_slope_proof": "SDitH/Proofs/ForkSlope.lean",
+   "fork_slope_prefix_proof": "SDitH/Proofs/ForkSlopePrefix.lean",
+   "fork_cut_proof": "SDitH/Proofs/ForkCut.lean",
+   "fork_cut_run_proof": "SDitH/Proofs/ForkCutRun.lean",
+   "visited_inputs_proof": "SDitH/Proofs/VisitedInputs.lean",
+   "branch_accounting_proof": "SDitH/Proofs/BranchAccounting.lean",
+   "fork_outcome_proof": "SDitH/Proofs/ForkOutcome.lean",
+   "fork_event_union_proof": "SDitH/Proofs/ForkEventUnion.lean",
+   "fork_good_outcome_proof": "SDitH/Proofs/ForkGoodOutcome.lean",
+   "fork_slope_uniform_proof": "SDitH/Proofs/ForkSlopeUniform.lean",
+   "fork_outcome_uniform_proof": "SDitH/Proofs/ForkOutcomeUniform.lean",
+   "slope_consistency_link_proof": "SDitH/Proofs/SlopeConsistencyLink.lean",
+   "witness_line_recovery_proof": "SDitH/Proofs/WitnessLineRecovery.lean",
+   "candidate_fork_slope_proof": "SDitH/Proofs/CandidateForkSlope.lean",
+   "candidate_branch_proof": "SDitH/Proofs/CandidateBranch.lean",
+   "candidate_fork_outcome_proof": "SDitH/Proofs/CandidateForkOutcome.lean",
+   "piop_extraction_proof": "SDitH/Proofs/PIOPExtraction.lean",
+   "fork_extraction_proof": "SDitH/Proofs/ForkExtraction.lean",
+   "candidate_reduction_proof": "SDitH/Proofs/CandidateReduction.lean",
+   "forgery_reduction_proof": "SDitH/Proofs/ForgeryReduction.lean",
+   "extraction_split_proof": "SDitH/Proofs/ExtractionSplit.lean",
+   "simulated_solver_proof": "SDitH/Proofs/SimulatedSolver.lean"
+  },
+  {
+   "algorithm": 13,
+   "title": "PIOP.Prover.Format",
+   "pdf_page": 34,
+   "printed_page": 32,
+   "status": "flat-array parsing and mask computation formalized; degree and evaluation proved",
+   "specification": "SDitH/Spec/PIOPArithmetic.lean",
+   "proof": "SDitH/Proofs/PIOPArithmetic.lean"
+  },
+  {
+   "algorithm": 14,
+   "title": "PIOP.Verifier.Format",
+   "pdf_page": 34,
+   "printed_page": 32,
+   "status": "flat-array parsing and mask computation formalized; evaluation agreement proved",
+   "specification": "SDitH/Spec/PIOPArithmetic.lean",
+   "proof": "SDitH/Proofs/PIOPArithmetic.lean"
+  },
+  {
+   "algorithm": 15,
+   "title": "PIOP.Prover.UnitaryCheck",
+   "pdf_page": 35,
+   "printed_page": 33,
+   "status": "arithmetic formalized; evaluation and quadratic bound proved; degree-one annotation refuted",
+   "specification": "SDitH/Spec/PIOPArithmetic.lean",
+   "proof": "SDitH/Proofs/PIOPEncodingDiscrepancies.lean",
+   "constraint_status": "binary D(Y)=0 iff at most one coordinate is nonzero; degree below 32, packed-loop equivalence and exact uniform cancellation probability proved in all submitted fields",
+   "additional_specification": "SDitH/Spec/UnitaryPolynomial.lean",
+   "additional_proofs": [
+    "SDitH/Proofs/UnitaryPolynomial.lean",
+    "SDitH/Proofs/UnitaryPacking.lean"
+   ],
+   "probability_proof": "SDitH/Proofs/UnitaryProbability.lean"
+  },
+  {
+   "algorithm": 16,
+   "title": "PIOP.Verifier.UnitaryCheck",
+   "pdf_page": 35,
+   "printed_page": 33,
+   "status": "arithmetic formalized; evaluation agreement proved",
+   "specification": "SDitH/Spec/PIOPArithmetic.lean",
+   "proof": "SDitH/Proofs/PIOPArithmetic.lean",
+   "constraint_status": "binary D(Y)=0 iff at most one coordinate is nonzero; degree below 32, packed-loop equivalence and exact uniform cancellation probability proved in all submitted fields",
+   "additional_specification": "SDitH/Spec/UnitaryPolynomial.lean",
+   "additional_proofs": [
+    "SDitH/Proofs/UnitaryPolynomial.lean",
+    "SDitH/Proofs/UnitaryPacking.lean"
+   ],
+   "probability_proof": "SDitH/Proofs/UnitaryProbability.lean"
+  },
+  {
+   "algorithm": 17,
+   "title": "PIOP.Prover.MuxTree",
+   "pdf_page": 37,
+   "printed_page": 35,
+   "status": "displayed recurrence formalized; evaluation and degree proved; pseudocode indexing and witness-order issues unresolved",
+   "specification": "SDitH/Spec/PIOPArithmetic.lean",
+   "proof": "SDitH/Proofs/PIOPDegree.lean",
+   "linearity_proof": "SDitH/Proofs/MuxLinearity.lean"
+  },
+  {
+   "algorithm": 18,
+   "title": "PIOP.Verifier.MuxTree",
+   "pdf_page": 37,
+   "printed_page": 35,
+   "status": "displayed recurrence formalized; evaluation proved; indexing and witness-order correspondence unresolved",
+   "specification": "SDitH/Spec/PIOPArithmetic.lean",
+   "proof": "SDitH/Proofs/PIOPArithmetic.lean",
+   "linearity_proof": "SDitH/Proofs/MuxLinearity.lean"
+  },
+  {
+   "algorithm": 19,
+   "title": "PIOP.Prover.Run",
+   "pdf_page": 38,
+   "printed_page": 36,
+   "status": "post-challenge composition with Algorithm 21 and flat parsing formalized under explicit chunk-size equality; evaluation, degree, constant-term identity, exact uniform batching law and detailed comparison bound proved; intended witness correspondence, concrete challenges and signature integration incomplete",
+   "specification": "SDitH/Spec/PIOPArithmetic.lean",
+   "proof": "SDitH/Proofs/PIOPDegree.lean",
+   "additional_proof": "SDitH/Proofs/WitnessPIOPDiscrepancy.lean",
+   "composition_specification": "SDitH/Spec/PIOPComposition.lean",
+   "composition_proof": "SDitH/Proofs/PIOPComposition.lean",
+   "piop_mask_split_proof": "SDitH/Proofs/PIOPMaskSplit.lean",
+   "piop_mask_coeff_proof": "SDitH/Proofs/PIOPMaskCoeff.lean",
+   "hashed_pads_proof": "SDitH/Proofs/HashedPads.lean",
+   "top_coefficient_proof": "SDitH/Proofs/TopCoefficient.lean",
+   "hashed_view_proof": "SDitH/Proofs/HashedView.lean",
+   "honest_view_proof": "SDitH/Proofs/HonestView.lean",
+   "comparison_specification": "SDitH/Spec/DetailedPIOPChallenges.lean",
+   "comparison_proof": "SDitH/Proofs/DetailedPIOPChallenges.lean"
+  },
+  {
+   "algorithm": 20,
+   "title": "PIOP.Verifier.Run",
+   "pdf_page": 39,
+   "printed_page": 37,
+   "status": "post-challenge composition with Algorithm 21 and flat parsing formalized under explicit chunk-size equality; evaluation, degree, constant-term identity, exact uniform batching law and detailed comparison bound proved; intended witness correspondence, concrete challenges and signature integration incomplete",
+   "specification": "SDitH/Spec/PIOPArithmetic.lean",
+   "proof": "SDitH/Proofs/PIOPArithmetic.lean",
+   "additional_proof": "SDitH/Proofs/WitnessPIOPDiscrepancy.lean",
+   "composition_specification": "SDitH/Spec/PIOPComposition.lean",
+   "composition_proof": "SDitH/Proofs/PIOPComposition.lean",
+   "comparison_specification": "SDitH/Spec/DetailedPIOPChallenges.lean",
+   "comparison_proof": "SDitH/Proofs/DetailedPIOPChallenges.lean"
+  },
+  {
+   "algorithm": 21,
+   "title": "BatchLinearEquations",
+   "pdf_page": 39,
+   "printed_page": 37,
+   "status": "typed mathematical algorithm, residual identity and full padded embedding injectivity proved in all Table-2 fields; exact 2^(-lambda) cancellation probability for a fixed nonzero residual under uniform coefficients; concrete challenge and primitive integration unfinished",
+   "specification": "SDitH/Spec/Batching.lean",
+   "proof": "SDitH/Proofs/Batching.lean",
+   "additional_proof": "SDitH/Proofs/ConcreteEncodings.lean",
+   "probability_proof": "SDitH/Proofs/BatchingProbability.lean"
+  }
+ ],
+ "unnumbered_subroutines": [
+  {
+   "title": "SampleFieldElements; ExpandH; consistency and batching challenge layouts",
+   "pdf_pages": [
+    20,
+    21
+   ],
+   "printed_pages": [
+    18,
+    19
+   ],
+   "status": "byte conversions and matrix loops with decomposition, recovery, consumption and layouts proved; polynomial-basis decoding and uniform-input laws retain explicit byte order; bounded finite PRG output correspondence for binary/extension sampling and ExpandH, plus actual SHAKE consistency-bit correspondence proved; concrete wire order, consumption policy, undefined integer assignment and cryptographic distribution claims remain unresolved",
+   "specification": "SDitH/Spec/ByteSampling.lean",
+   "proof": "SDitH/Proofs/ByteSampling.lean",
+   "representation_specification": "SDitH/Spec/FieldBytes.lean",
+   "representation_proof": "SDitH/Proofs/FieldBytes.lean",
+   "probability_proofs": [
+    "SDitH/Proofs/FieldByteProbability.lean",
+    "SDitH/Proofs/BinarySamplingProbability.lean",
+    "SDitH/Proofs/FieldChallengeLaw.lean"
+   ],
+   "concrete_proofs": [
+    "SDitH/Proofs/PRGSampling.lean",
+    "SDitH/Proofs/ConcreteBLC.lean"
+   ]
+  },
+  {
+   "title": "Concrete hash/cipher evaluation challenges and SHAKE batching",
+   "pdf_pages": [
+    21,
+    22
+   ],
+   "printed_pages": [
+    19,
+    20
+   ],
+   "status": "actual SHAKE transcripts, integer loop, binary grinding and polynomial-basis batching; complete staged cipher body composes 4*lambda-byte material read, optional parse/MapToBits/Extract interpretations, actual Enc* xor and fresh final SHAKE integer loop; return provenance, finite-fuel stability, separate source boundaries and missing-B no-return proved; no default parser/extraction correction, B=v assignment or uniform SHAKE law",
+   "specification": "SDitH/Spec/ConcreteChallenges.lean",
+   "proof": "SDitH/Proofs/ConcreteChallenges.lean",
+   "input_preparation_specification": "SDitH/Spec/CipherGrinding.lean",
+   "input_preparation_proof": "SDitH/Proofs/CipherGrinding.lean",
+   "cipher_composition_specification": "SDitH/Spec/CipherEvaluation.lean",
+   "cipher_composition_proof": "SDitH/Proofs/CipherEvaluation.lean"
+  },
+  {
+   "title": "Table 2 quotient representations",
+   "pdf_pages": [
+    41
+   ],
+   "printed_pages": [
+    39
+   ],
+   "status": "literal quotient rings, monicity, degrees, power bases, coefficient-encoding injectivity, irreducibility, field instances and exact cardinalities proved; byte decoding and concrete algorithm integration unfinished",
+   "specification": "SDitH/Spec/FieldRepresentation.lean",
+   "proof": "SDitH/Proofs/FieldRepresentation.lean",
+   "irreducibility_proof": "SDitH/Proofs/FieldIrreducibility.lean",
+   "packing_uniform_proof": "SDitH/Proofs/PackingUniform.lean",
+   "certificate_generator": "scripts/generate_field_certificates.py"
+  },
+  {
+   "title": "Binary unitary polynomial and packed equation (6)",
+   "pdf_pages": [
+    34,
+    35
+   ],
+   "printed_pages": [
+    32,
+    33
+   ],
+   "status": "off-diagonal coefficient characterization and actual packed-loop equivalence proved in all Table-2 quotients for checked submitted dimensions; no randomized soundness claim",
+   "specification": "SDitH/Spec/UnitaryPolynomial.lean",
+   "proofs": [
+    "SDitH/Proofs/UnitaryPolynomial.lean",
+    "SDitH/Proofs/UnitaryPacking.lean"
+   ]
+  },
+  {
+   "title": "Introductory PIOP uniform-challenge experiment and soundness claim",
+   "pdf_pages": [
+    5,
+    6
+   ],
+   "printed_pages": [
+    3,
+    4
+   ],
+   "status": "uniform linear-batch probability and root probability proved; degree bounds derived; deterministic and randomized gamma-dependent responses bounded with d+1 for consistent openings; printed d-based bound refuted in all Table-2 fields; commitment/knowledge soundness, ZK and Fiat-Shamir integration unfinished",
+   "specification": "SDitH/Spec/PIOPChallenges.lean",
+   "sampling_specification": "SDitH/Spec/UniformChallenges.lean",
+   "proof": "SDitH/Proofs/PIOPChallenges.lean",
+   "probability_proof": "SDitH/Proofs/UniformChallenges.lean",
+   "mixture_proof": "SDitH/Proofs/ChallengeMixtures.lean",
+   "discrepancy_proof": "SDitH/Proofs/PIOPSoundnessDiscrepancy.lean"
+  },
+  {
+   "title": "Equation (6) and detailed PIOP batching/comparison probabilities",
+   "pdf_pages": [
+    35,
+    38,
+    39
+   ],
+   "printed_pages": [
+    33,
+    36,
+    37
+   ],
+   "status": "exact unitary and joint constant-term cancellation law for fresh uniform coefficients; randomized consistent-opening comparison bounded with degree d; explicit dimension and literal mux residual boundaries; no concrete hash or signature security claim",
+   "specifications": [
+    "SDitH/Spec/PIOPComposition.lean",
+    "SDitH/Spec/DetailedPIOPChallenges.lean"
+   ],
+   "proofs": [
+    "SDitH/Proofs/UnitaryProbability.lean",
+    "SDitH/Proofs/MuxLinearity.lean",
+    "SDitH/Proofs/PIOPComposition.lean",
+    "SDitH/Proofs/DetailedPIOPChallenges.lean"
+   ]
+  },
+  {
+   "title": "SampleIntegers full staged vector loop and threshold arithmetic",
+   "pdf_pages": [
+    20
+   ],
+   "printed_pages": [
+    18
+   ],
+   "status": "full fuel-observed vector loop with exact four-byte attempts, pending/undefined/returned distinctions and an optional fixed B binding; completion stability, literal nonempty no-return, universal first-candidate acceptance for power-of-two ranges and exact constant-residue/cursor result for a supplied fixed B; prior word/threshold/uniform-prefix laws retained; B is never replaced by v",
+   "specification": "SDitH/Spec/IntegerSamplingVector.lean",
+   "prefix_specification": "SDitH/Spec/IntegerSampling.lean",
+   "proofs": [
+    "SDitH/Proofs/IntegerSampling.lean",
+    "SDitH/Proofs/IntegerSamplingProbability.lean",
+    "SDitH/Proofs/IntegerSamplingVector.lean"
+   ]
+  },
+  {
+   "title": "Section 5.1 displayed SD-to-RSD reduction and fixed-witness regularization",
+   "pdf_pages": [
+    44,
+    45
+   ],
+   "printed_pages": [
+    42,
+    43
+   ],
+   "status": "randomized algorithm specified; equal-fiber permutation law, regular-support count, exact flat-witness regularization probability, permutation/truncation correctness, conditional randomized return correctness and deterministic uniqueness step proved; pointwise instance-event equality refuted on a valid binary instance; heuristic conditional uniqueness, solver distribution and runtime remain unproved",
+   "specifications": [
+    "SDitH/Spec/RegularSupport.lean",
+    "SDitH/Spec/SDReduction.lean"
+   ],
+   "proofs": [
+    "SDitH/Proofs/RegularSupport.lean",
+    "SDitH/Proofs/PermutationProbability.lean",
+    "SDitH/Proofs/SDReduction.lean",
+    "SDitH/Proofs/SDReductionProbability.lean",
+    "SDitH/Proofs/SDReductionDiscrepancy.lean"
+   ]
+  },
+  {
+   "title": "Polynomial-basis isomorphism and representation-parameterized byte sampling",
+   "pdf_pages": [
+    20,
+    21,
+    36,
+    41
+   ],
+   "printed_pages": [
+    18,
+    19,
+    34,
+    39
+   ],
+   "status": "full submitted coefficient linear isomorphism, byte-pack bijections and round trips, used-byte recovery, binary and extension vector uniform laws and two-call batching law proved; explicit coefficient order and consumption counts remain visible; batching law equated with detailed PIOP uniform challenge law for arbitrary continuation; concrete wire order and PRG/XOF distribution are not assumed",
+   "specifications": [
+    "SDitH/Spec/FieldRepresentation.lean",
+    "SDitH/Spec/ByteSampling.lean",
+    "SDitH/Spec/FieldBytes.lean"
+   ],
+   "proofs": [
+    "SDitH/Proofs/FieldIsomorphism.lean",
+    "SDitH/Proofs/FieldBytes.lean",
+    "SDitH/Proofs/UniformVectors.lean",
+    "SDitH/Proofs/FieldByteProbability.lean",
+    "SDitH/Proofs/FieldChallengeLaw.lean",
+    "SDitH/Proofs/BinarySamplingProbability.lean"
+   ]
+  },
+  {
+   "title": "Section 6 scaled witnesses/arithmetic, packing boundary, variant size formulas and Tables 7\u201310",
+   "pdf_pages": [
+    47,
+    48,
+    49,
+    50
+   ],
+   "printed_pages": [
+    45,
+    46,
+    47,
+    48
+   ],
+   "status": "tables/formulas and numerical checks proved; scaled witness encoding, actual composed arithmetic evaluation/degree/constant term and uniform algebraic comparison bound checked; raw regularity iff nonzero amplitudes and all-zero arithmetic acceptance expose missing enforcement; injective Table-7 packing requires at least four large-field elements and unchanged binary packing has a nonzero batching kernel; this reuse is not asserted as the outline's unique protocol; full variants, scalar codecs/embedding, nonzero enforcement, source resolutions and security remain unspecified or unfinished",
+   "specifications": [
+    "SDitH/Spec/VariantParameters.lean",
+    "SDitH/Spec/ScaledWitness.lean",
+    "SDitH/Spec/ScaledArithmetic.lean"
+   ],
+   "proofs": [
+    "SDitH/Proofs/VariantParameters.lean",
+    "SDitH/Proofs/ScaledWitness.lean",
+    "SDitH/Proofs/ScaledMuxDegree.lean",
+    "SDitH/Proofs/ScaledArithmetic.lean",
+    "SDitH/Proofs/ScaledArithmeticProbability.lean",
+    "SDitH/Proofs/ScaledPackingBoundary.lean"
+   ]
+  },
+  {
+   "title": "Key-generation seed law, literal syndrome assignment and typed matrix initialization",
+   "pdf_pages": [
+    13,
+    14,
+    15,
+    16
+   ],
+   "printed_pages": [
+    11,
+    12,
+    13,
+    14
+   ],
+   "specification": "SDitH/Spec/KeyGeneration.lean",
+   "proof": "SDitH/Proofs/KeyGeneration.lean",
+   "status": "independent seed-pair uniform law and deterministic pushforward independence; concrete ExpandH coordinates/finite-PRG correspondence, generated weight and witness length, explicit identity-block permutation and unpermuted discrepancy, exact SD kernel condition for an externally bound x_A and repeat-matrix correspondence checked; undefined integer assignment/x_A, raw codecs, consumption policy and whole initialization/signing integration remain unresolved"
+  },
+  {
+   "title": "Typed key-codec capacity boundary, full Tables 4/5 and reported Table-6 timings",
+   "pdf_pages": [
+    14,
+    15,
+    16,
+    41,
+    42,
+    43
+   ],
+   "printed_pages": [
+    12,
+    13,
+    14,
+    39,
+    40,
+    41
+   ],
+   "status": "actual typed public and fixed-witness-length secret key-space cardinalities and necessary injective fixed-width codec lower bounds proved, without assigning codec laws to source Serialize; all Tables-4/5 sizes and numerical budgets checked; prose tree-size/grinding disagreement proved; Table-6 medians/metadata isolated as reported empirical data with row-label correspondence only; raw codecs/padding, measurement validation, analytic parameter selection and security remain unresolved",
+   "specifications": [
+    "SDitH/Spec/KeySizeBoundary.lean",
+    "SDitH/Spec/MainParameterTables.lean",
+    "SDitH/Spec/ReportedBenchmarks.lean"
+   ],
+   "proofs": [
+    "SDitH/Proofs/KeySizeBoundary.lean",
+    "SDitH/Proofs/MainParameterTables.lean"
+   ]
+  },
+  {
+   "title": "Literal density dimensions and byte-aligned selection",
+   "pdf_pages": [
+    40
+   ],
+   "printed_pages": [
+    38
+   ],
+   "specification": [
+    "SDitH/Spec/ParameterSelection.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/ParameterSelection.lean"
+   ],
+   "status": "Literal integer floor/sign formulas retained; average-fiber density, exact logarithmic/ceiling criterion and byte-aligned maximum with explicit feasibility proved. SD rounding and RSD theta-sign counterexamples checked. Greedy arity optimization, source resolution and hardness calibration remain unfinished."
+  },
+  {
+   "title": "Actual SD-to-RSD joint probability experiment and conditional-uniqueness gap",
+   "pdf_pages": [
+    44,
+    45
+   ],
+   "printed_pages": [
+    42,
+    43
+   ],
+   "specification": [
+    "SDitH/Spec/SDReductionGame.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/SDReductionGame.lean",
+    "SDitH/Proofs/SDReductionConditioning.lean"
+   ],
+   "status": "Output law equals the displayed reduction; full-regularity probability lower-bounded by the proved combinatorial factor for solvable input laws; success lower bound uses actual conditional return/uniqueness probabilities. Correct selective solver has positive return mass and zero conditional uniqueness in the planted-uniform model satisfying the density condition. Refutes an intermediate universal uniqueness bound, not final Theorem 5.1. Induced solver distribution, final quantitative bound and runtime remain unfinished."
+  },
+  {
+   "title": "Commitment collision reductions through actual BAVC reconstruction and verifier hash chain",
+   "pdf_pages": [
+    24,
+    26,
+    30,
+    32
+   ],
+   "printed_pages": [
+    22,
+    24,
+    28,
+    30
+   ],
+   "specification": [
+    "SDitH/Spec/BAVCBinding.lean",
+    "SDitH/Spec/BLCBinding.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/BAVCBinding.lean",
+    "SDitH/Proofs/BAVCBindingReconstruction.lean",
+    "SDitH/Proofs/BLCBinding.lean"
+   ],
+   "status": "Computable finder on actual two-level Hashbavc bit strings; fixed-width serialization injective, returned pairs are actual hash queries, successful reconstructed seed disagreement reduces to a hash or same-index seed-commitment collision. Seed collision yields matching two cipher outputs under distinct keys at distinct tweak inputs. Actual prepared BLC prefixes and concrete verifier suffixes yield equal BAVC roots or collisions on exact Hashlines/Hashaux queries. Adaptive ROM/ICM probabilities, Category-III truncated-cipher analysis, full BLC binding, aliases/missing bindings, line-21 resolution, challenge separation and extraction remain open; no primitive-security assumption or source repair."
+  },
+  {
+   "title": "Adaptive shared-oracle collision bound and fully queried BAVC hash binding",
+   "pdf_pages": [
+    24,
+    26,
+    46
+   ],
+   "printed_pages": [
+    22,
+    24,
+    44
+   ],
+   "specification": [
+    "SDitH/Spec/RandomOracleCollision.lean",
+    "SDitH/Spec/BAVCBindingROM.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/RandomOracleCollision.lean",
+    "SDitH/Proofs/RandomOracleCollisionInvariant.lean",
+    "SDitH/Proofs/BAVCBindingROM.lean"
+   ],
+   "status": "Adaptive lazy-oracle birthday bound proved from actual query semantics, with exact table/log correspondence and collision-flag completeness. Actual two-layer BAVC finder converts fully queried equal-root distinct salt/commitment data into stored collisions, giving choose(q,2)/2^(2*lambda) for arbitrary adaptive final choice. Query-coverage checks are part of this limited experiment; it is not yet the full signing/verification game. Total honest/adversarial query accounting, unqueried finalization, seed/cipher collision probabilities, full BLC binding, extraction and signing simulation remain open. No SHAKE-randomness assertion or assumed binding contract."
+  },
+  {
+   "title": "BAVC hash-binding experiment with both verification computations executed",
+   "pdf_pages": [
+    24,
+    26,
+    46
+   ],
+   "printed_pages": [
+    22,
+    24,
+    44
+   ],
+   "specification": [
+    "SDitH/Spec/OracleProgram.lean",
+    "SDitH/Spec/RandomOraclePipeline.lean",
+    "SDitH/Spec/BAVCHashVerification.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/OracleProgram.lean",
+    "SDitH/Proofs/RandomOraclePipeline.lean",
+    "SDitH/Proofs/BAVCHashVerification.lean"
+   ],
+   "status": "Programs execute both source row/outer hash computations after adaptive data selection using the adversary's shared lazy oracle. Program completion, lookup coverage and exact root equations are derived. The hash-binding probability is at most choose(q+2*(tau+1),2)/2^(2*lambda); verification queries count even when repeated or previously absent. No already-queried success guard or discarded incomplete executions. Seed/cipher binding, full BLC/signature composition, extraction, simulation, XOF correspondence and runtime remain open."
+  },
+  {
+   "title": "Adaptive ideal-cipher experiment and conditional fresh-query laws",
+   "pdf_pages": [
+    17,
+    20,
+    23,
+    46
+   ],
+   "printed_pages": [
+    15,
+    18,
+    21,
+    44
+   ],
+   "specification": [
+    "SDitH/Spec/IdealCipher.lean",
+    "SDitH/Spec/IdealCipherSeed.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/FinitePosterior.lean",
+    "SDitH/Proofs/UniformSymmetry.lean",
+    "SDitH/Proofs/IdealCipher.lean",
+    "SDitH/Proofs/IdealCipherFresh.lean",
+    "SDitH/Proofs/IdealCipherInverse.lean",
+    "SDitH/Proofs/IdealCipherCapacity.lean",
+    "SDitH/Proofs/IdealCipherSeed.lean",
+    "SDitH/Proofs/IdealCipherTrace.lean"
+   ],
+   "status": "Exact adaptive equivalence of once-sampled keyed permutations and posterior-compatible-family sampling proved and linked to Assumptions.idealCipherFamily. Encryption/decryption repeats are deterministic; fresh answers are uniform over the respective unused range given the whole transcript. Trace consistency and length, remaining-capacity and projected-event bounds proved. Category-III padded/truncated Enc* matches its source function and a fresh 192-bit target has probability at most 2^64/(2^256-q). These conditional laws feed the subsequent paired-cipher collision proof. Complete verification composition and costs, full BLC/signature binding, extraction and simulation remain open; no AES/Rijndael security or new cryptographic assumption is asserted."
+  },
+  {
+   "title": "Adaptive paired-cipher collision reduction and source seed correspondence",
+   "pdf_pages": [
+    17,
+    20,
+    23,
+    46
+   ],
+   "printed_pages": [
+    15,
+    18,
+    21,
+    44
+   ],
+   "specification": [
+    "SDitH/Spec/SeedPairing.lean",
+    "SDitH/Spec/IdealCipherJoint.lean",
+    "SDitH/Spec/IdealCipherPairCollision.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/SeedPairing.lean",
+    "SDitH/Proofs/IdealCipherJoint.lean",
+    "SDitH/Proofs/IdealCipherComparison.lean",
+    "SDitH/Proofs/IdealCipherPairCollision.lean",
+    "SDitH/Proofs/IdealCipherPairProbability.lean",
+    "SDitH/Proofs/IdealCipherPairAdaptive.lean",
+    "SDitH/Proofs/SeedPairBinding.lean"
+   ],
+   "status": "Source companion inputs are a fixed bit-flip involution, preserved by padding. Joint posterior equality retains the hidden family for terminal tests. Conditional comparison, first-matching-pair decomposition and adaptive composition give choose(q,2)*C/(M-q)*C/(M-q-2), including inverse queries, repeated calls and changing keys, with checked full-output and Category-III capacities. Source seed collisions imply the bounded event when both left-half graph entries are present. The following fully queried verification construction discharges that coverage and includes all four calls. Full BLC/signature composition, extraction and signing simulation remain open. No new cryptographic assumption or final theorem."
+  },
+  {
+   "title": "Fully queried source seed-commitment binding in the ICM",
+   "pdf_pages": [
+    17,
+    20,
+    23,
+    46
+   ],
+   "printed_pages": [
+    15,
+    18,
+    21,
+    44
+   ],
+   "specification": [
+    "SDitH/Spec/IdealCipherPipeline.lean",
+    "SDitH/Spec/IdealCipherProgram.lean",
+    "SDitH/Spec/SeedVerification.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/IdealCipherPipeline.lean",
+    "SDitH/Proofs/IdealCipherProgram.lean",
+    "SDitH/Proofs/SeedVerification.lean",
+    "SDitH/Proofs/SourceSeedVerification.lean"
+   ],
+   "status": "Both selected source seed commitments execute all four calls on the adversary's same cipher family, also after early stopping. Exact completion, trace, source-output and success-predicate correspondence are proved. The fully queried experiment equals the direct source collision experiment without any membership/freshness/completion guard. Its bound is choose(q+4,2)*C/(M-(q+4))*C/(M-(q+6)), with C=1 for full outputs and C=2^64,M=2^256 for Category III. Source index/tweak constraints are explicit and structural companion/capacity conditions are discharged. Full seed/tree/reconstruction and shared hash/cipher signature composition, challenge consistency, RSD extraction and signing simulation remain open. No cryptographic assumption definition or final statement changed."
+  },
+  {
+   "title": "Shared adaptive hash/cipher execution and joint collision bound",
+   "assumption_model": "SDitH/Assumptions.lean",
+   "pdf_pages": [
+    17,
+    20,
+    23,
+    24,
+    26,
+    46
+   ],
+   "printed_pages": [
+    15,
+    18,
+    21,
+    22,
+    24,
+    44
+   ],
+   "specification": [
+    "SDitH/Spec/HashCipher.lean",
+    "SDitH/Spec/HashCipherProgram.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/HashCipher.lean",
+    "SDitH/Proofs/HashCipherHash.lean",
+    "SDitH/Proofs/HashCipherPair.lean",
+    "SDitH/Proofs/HashCipherSecurity.lean",
+    "SDitH/Proofs/HashCipherProgram.lean",
+    "SDitH/Proofs/HashCipherSourcePrograms.lean",
+    "SDitH/Proofs/HashCipherParameters.lean"
+   ],
+   "status": "One shared lazy hash table and one cipher family support adaptive interleaving. Exact joint posterior/fixed-family law, hash graph/flag consistency, cipher graph consistency, total query count and both collision bounds are proved. Their joint bad-event bound is choose(q,2)*(1/|Digest|+C/(M-q)*C/(M-q-2)); source-width capacities are discharged. Existing source hash and seed verification programs have exact lifts into this interpreter, with complete query coverage and component winning-to-collision proofs. The following entries extend this model to sequential verification and actual reconstruction cipher stages. Complete BLC/signature correspondence, usable challenges, RSD extraction and signing simulation remain open. The joint sampling choice is re-exported as Assumptions.sharedOracleModel; uniform marginals alone do not imply it. No SHAKE/AES/Rijndael security inference, cryptographic axiom or new final statement."
+  },
+  {
+   "title": "Sequential verification after a mixed hash/cipher adversary",
+   "pdf_pages": [
+    17,
+    20,
+    23,
+    24,
+    26,
+    46
+   ],
+   "printed_pages": [
+    15,
+    18,
+    21,
+    22,
+    24,
+    44
+   ],
+   "specification": [
+    "SDitH/Spec/HashCipherPipeline.lean",
+    "SDitH/Spec/HashCipherVerification.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/HashCipherPipeline.lean",
+    "SDitH/Proofs/HashCipherPipelineSecurity.lean",
+    "SDitH/Proofs/HashCipherVerification.lean",
+    "SDitH/Proofs/HashCipherSourceSeedVerification.lean"
+   ],
+   "status": "The verification phase starts after stopping or exhaustion, retaining both histories, the same cipher family and hash table, and the OR of both hash-collision flags. Exact joint posterior/fixed-family law and extension of the standalone joint model are proved. Both component bounds and their joint bound use q+k total mixed actions. Actual source seed checks and BAVC row/outer hash checks complete with derived coverage. The seed winning law equals the literal source collision predicate for full and Category-III outputs without guards, bounded using q+4; the hash bound uses q+2*(tau+1). Complete BAVC reconstruction binding, signature/replay query accounting, usable challenges, extraction and signing simulation remain open."
+  },
+  {
+   "title": "Actual BAVC reconstruction cipher programs and source correspondence",
+   "pdf_pages": [
+    17,
+    20,
+    23,
+    26
+   ],
+   "printed_pages": [
+    15,
+    18,
+    21,
+    24
+   ],
+   "specification": "SDitH/Spec/BAVCCipherProgram.lean",
+   "proof": "SDitH/Proofs/BAVCCipherProgram.lean",
+   "status": "Finite cipher-query programs execute the source internal-node expansion, revealed-leaf commitments and row loops after the literal prefill. Their exact values equal the existing reconstructionRows definition, including every error, for any initial cipher history. The derived bound is 2*(tau*N-1)+2*N*tau calls. Full and Category-III layouts equal the corresponding Enc* functions. Exact execution in the shared interpreter preserves the hash table/log and records the actual cipher calls. Distinct tree/nodes bindings, source guards and missing-read errors remain unchanged. The next entry supplies ordered hash composition, paired reconstruction coverage and its disagreement bound; the complete signature binding reduction remains unfinished."
+  },
+  {
+   "title": "Ordered complete reconstruction and shared-execution disagreement bound",
+   "pdf_pages": [
+    17,
+    20,
+    23,
+    26,
+    46
+   ],
+   "printed_pages": [
+    15,
+    18,
+    21,
+    24,
+    44
+   ],
+   "specification": [
+    "SDitH/Spec/HashCipherEvaluation.lean",
+    "SDitH/Spec/BAVCReconstructionProgram.lean",
+    "SDitH/Spec/BAVCReconstructionGame.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/HashCipherEvaluation.lean",
+    "SDitH/Proofs/BAVCReconstructionProgram.lean",
+    "SDitH/Proofs/BAVCReconstructionCoverage.lean",
+    "SDitH/Proofs/BAVCReconstructionGame.lean",
+    "SDitH/Proofs/BAVCReconstructionSecurity.lean"
+   ],
+   "status": "Algorithm 9 executes each row's cipher calls immediately followed by that row's hash, then the outer hash. Every supported run completes at the exact staged source result, including all errors. Evaluation derives every used hash lookup and cipher graph entry. Both selected reconstructions run after a mixed adversary, retaining errors; the second runs even if the first errors. Equal-root successful outputs with disagreeing common revealed seeds yield a stored hash collision or an actually covered same-index seed collision. Full-output and Category-III probability bounds follow with Q=q+2*B, B=2*(tau*N-1)+(2*N+1)*tau+1. The bound is choose(Q,2)*(1/|Digest|+C/(M-Q)*C/(M-Q-2)), with companion/capacity premises discharged and source width/tweak bounds explicit. No coverage guard or postulated binding contract is used. This event concerns successful reconstruction disagreement, not signature acceptance; undefined-source outcomes are retained and not used for a vacuous signature-security claim. Complete BLC linkage, signature/replay costs, usable challenges, RSD extraction and signing simulation remain open."
+  },
+  {
+   "title": "Adaptive signature-security game, useful-query selection and forgery-to-replay bound",
+   "pdf_pages": [
+    14,
+    15,
+    16,
+    46
+   ],
+   "printed_pages": [
+    12,
+    13,
+    14,
+    44
+   ],
+   "specification": [
+    "SDitH/Spec/RandomOracle.lean",
+    "SDitH/Spec/SignatureSecurity.lean",
+    "SDitH/Spec/AbstractSignature.lean",
+    "SDitH/Spec/SignatureHashGame.lean",
+    "SDitH/Spec/SignatureReplay.lean",
+    "SDitH/Spec/SignatureQuerySelection.lean"
+   ],
+   "proof": [
+    "SDitH/Proofs/SignatureSecurity.lean",
+    "SDitH/Proofs/AbstractSignature.lean",
+    "SDitH/Proofs/SignatureHashGame.lean",
+    "SDitH/Proofs/SignatureReplay.lean",
+    "SDitH/Proofs/SignatureFork.lean",
+    "SDitH/Proofs/SignatureReplayConsistency.lean",
+    "SDitH/Proofs/SignatureQuerySelection.lean",
+    "SDitH/Proofs/SignatureQueryProvenance.lean",
+    "SDitH/Proofs/SignatureForgeryFork.lean"
+   ],
+   "status": "Bounded adaptive game and explicit prepare/hash/open sequence; exact cut/resume law, fresh-query provenance, useful-index selection and saved-answer consistency proved. Defined uniform-index replay satisfies max(e-delta,0)^2 <= q^2*(F+delta), with forgery mass e, action budget q, fork mass F and delta=2^(-2*lambda) at the source typed record shapes. Intermediate bounds e<=q*s+delta and s^2<=F+s*delta use actual selected-success mass s. Successful forks give two accepted fresh-message attempts at one input with distinct tested digests. Replay still uses the honest secret. Signing simulation, commitment security, usable challenge separation, RSD extraction, runtime and concrete/domain/codec correspondence remain open. No end-to-end EUF-CMA claim, optimal-loss claim or assumed security contracts."
+  }
+ ],
+ "external_references": "source/standards/index.json",
+ "concrete_hash_xof": {
+  "source": "Table 1; sections 3.2.1 and 3.2.3; FIPS 202 sections 3\u20136.2",
+  "specification": [
+   "SDitH/Spec/Keccak.lean",
+   "SDitH/Spec/SHAKE.lean",
+   "SDitH/Spec/HashPrimitives.lean"
+  ],
+  "proof": [
+   "SDitH/Proofs/Keccak.lean",
+   "SDitH/Proofs/SHAKE.lean",
+   "SDitH/Proofs/HashPrimitives.lean",
+   "SDitH/Proofs/KeccakConstants.lean",
+   "SDitH/Proofs/SHAKEReading.lean"
+  ],
+  "examples": "SDitH/Proofs/SHAKEExamples.lean",
+  "boundary": "Deterministic SHAKE body with FIPS bit-equation refinement, padding/block/reader correspondence, BAVC hashing and explicit-serialization BLC hashes/consistency matrix. No concrete random-oracle/security claim; missing transcript/field/counter serialization remains unresolved. CipherPrimitives supplies Table-1 ciphers; PRG retains explicit source gaps."
+ },
+ "concrete_ciphers": {
+  "source": "Table 1 and section 3.2.1; FIPS 197-upd1 and the original Rijndael version-2 proposal",
+  "specification": [
+   "SDitH/Spec/RijndaelByte.lean",
+   "SDitH/Spec/Rijndael.lean",
+   "SDitH/Spec/CipherPrimitives.lean"
+  ],
+  "proof": [
+   "SDitH/Proofs/RijndaelByte.lean",
+   "SDitH/Proofs/RijndaelByteCertificates.lean",
+   "SDitH/Proofs/Rijndael.lean",
+   "SDitH/Proofs/RijndaelSchedule.lean",
+   "SDitH/Proofs/CipherPrimitives.lean"
+  ],
+  "examples": [
+   "SDitH/Proofs/AESExample.lean",
+   "SDitH/Proofs/Rijndael256Examples.lean"
+  ],
+  "boundary": "Full deterministic AES-128 and Rijndael-256-256 bodies; byte arithmetic interpreted in the actual 256-element polynomial quotient field, exact S-box relation, key recurrence and complete keyed permutations proved. Explicit low-bit-first packing, FIPS displayed-bit conversion, Category-III padding/truncation and concrete BAVC primitive instantiation. Source transcription and external encoding correspondence remain human review. No ideal-cipher or whole-signature security claim."
+ },
+ "concrete_prg": {
+  "source": "Algorithm 6, printed page 17; section 3.2.2, printed pages 18-19; Algorithm 10, printed page 28",
+  "specification": [
+   "SDitH/Spec/PRG.lean",
+   "SDitH/Spec/ConcreteBLC.lean"
+  ],
+  "proof": [
+   "SDitH/Proofs/PRG.lean",
+   "SDitH/Proofs/PRGCounter.lean",
+   "SDitH/Proofs/PRGSampling.lean",
+   "SDitH/Proofs/ConcreteBLC.lean"
+  ],
+  "boundary": "Block-size denominator explicitly supplied with positivity, no default. Parse means a complete byte partition; none records an unresolved source assignment, not an invented algorithm rejection. Positive Category-III requests fail that shape. Present salt without tweak remains undefined. Low-bit-first byte representation and structured serializers require correspondence review. Counter uniqueness requires bounds; streams are periodic, and tweak 0/counter 2^16 equals tweak 1/counter 0. ConcreteBLC uses a zero total extension only outside the proved submitted tweak range. No pseudorandomness, ideal-cipher, hiding/binding or end-to-end security claim."
+ },
+ "bavc_reconstruction": {
+  "source": "Algorithm 9, printed page 24, physical page 26",
+  "specification": "SDitH/Spec/BAVCReconstruction.lean",
+  "proof": [
+   "SDitH/Proofs/BAVCPrefill.lean",
+   "SDitH/Proofs/BAVCReconstruction.lean"
+  ],
+  "boundary": "Starts from typed Opening, not raw byte decoding. The printed post-dequeue >=2 and remaining-path < Topen*lambda guards are retained. Undefined path reads and undeclared/empty nodes reads are distinct from explicit capacity/padding rejections. tree remains distinct from nodes; optional external binding supplies no aliasing rule or correctness assumption. Full-body Category-I rejection occurs before nodes is used. No reference-implementation attack, corrected reconstruction correctness, hiding/binding or whole-signature theorem is claimed."
+ }
+}

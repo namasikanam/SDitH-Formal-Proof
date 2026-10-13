@@ -1,0 +1,15 @@
+Build completed successfully (3113 jobs).
+Build completed successfully (3113 jobs).
+Build completed successfully (3113 jobs).
+Build completed successfully (3113 jobs).
+Build completed successfully (3113 jobs).
+Build completed successfully (3113 jobs).
+Build completed successfully (3104 jobs).
+Build completed successfully (3105 jobs).
+Build completed successfully (3105 jobs).
+Build completed successfully (3750 jobs).
+Audited 19132 SDitH declarations; all transitive axioms are allowlisted.
+'SDitH.Final.literal_piop_not_complete' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SDitH.Final.table3_dimension_mismatch' does not depend on any axioms
+'SDitH.Final.commitment_discrepancies' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build and axiom audit passed. Coverage remains separately tracked; not completion.
