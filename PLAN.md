@@ -1,8 +1,8 @@
 # SDitH formalization plan and checklist
 
-Last updated: 2026-10-14.
+Last updated: 2026-10-15.
 
-The latest full validation passed **3,753 build jobs and audited 19,149 project
+The latest full validation passed **3,755 build jobs and audited 19,173 project
 declarations**. This checks the current development, not whole-scheme correctness
 or security. See [validation output](audit/validation.log).
 
@@ -41,9 +41,12 @@ percentage.
 
 ## Track A — the security reduction
 
-Status: complete modulo the named assumptions. Final statement
-`SeedTermDischarge.forgery_le_final_hard_C`; the per-term checklist is in
-"Explicit terms of the composed forgery bound" below.
+Status: complete modulo the named assumptions. Final statements
+`SeedTermDischarge.forgery_le_final_hard_C` (generic layouts),
+`CandidateSerialization.forgery_le_final_full_enc` (full layout, candidate
+encoding) and `DistributionalFinal.averaged_forgery_le_final` (averaged over
+an instance distribution); the per-term checklist is in "Explicit terms of
+the composed forgery bound" below.
 
 - [x] Forgery-to-fork with useful-query selection and replay; extraction from
   two accepted transcripts; the witness-free solver; the hybrids over the
@@ -56,16 +59,28 @@ Status: complete modulo the named assumptions. Final statement
   expansion), `SimulatorTermBounds5` (mask-after-fork by decision 1; the
   other four need the challenge and batching expansions).
   If the decision changes, each is a well-scoped proof project that leaves the
-  rest of the final statement untouched.
+  rest of the final statement untouched, with one qualification found at
+  continuation 336: the four expansion-dependent constants and the retry
+  bound cannot be made small by a hypothesis on the deterministic expansion
+  parameter, because the forger evaluates it at every counter without a
+  query; discharging them needs the challenge expansion modelled as a
+  counted oracle of the digest and counter, a refactor of `SigningSetting`
+  and `VerifierSetting` across the reduction.
 - [x] Hardness as a named assumption: `InstanceHard` bounds every budgeted
   adversary's solver on the key generation's fixed instance by `εSD`, and
   the final statement carries `εSD` in place of the solver's success.
-- [ ] Hardness distribution (a modelling decision, review table row "Sampler
-  and keygen"): `InstanceHard` is stated on the fixed public instance of the
-  setting and over the reduction's solvers; `SDitH.Assumptions.SDHardness`
-  is stated over the planted distribution and a solver family; nothing
-  relates the key generation's seed-expanded systematic instance to that
-  distribution, and no runtime model exists.
+- [x] Hardness over a distribution: `DistributionalFinal` averages the bound
+  over any distribution of instances under `DistributionHard` (mean-square
+  form over any distribution; the averaged advantage on a finite index
+  type).
+- [ ] The key generation's own law (a decision, review table row "Sampler
+  and keygen"): Algorithm 2's literal routine returns no key (`B`, `x_A`
+  undefined), so its instance distribution is not formed and the
+  distribution is a parameter; `SDitH.Assumptions.SDHardness` (planted
+  uniform matrices) remains unconsumed, and no runtime model exists.
+- [x] Encoding hypotheses discharged at the named candidate encoding
+  (`CandidateSerialization`, one bit per coordinate); the encoding's
+  agreement with the implementation's packing is a review item.
 - [ ] Correspondence of the candidate scheme (`CandidateScheme`,
   `CandidateVerifier`, `CandidateBAVC`) to the submitted routines: blocked by
   the source defects of Track B (Algorithm 12's seed array and line 21, the
@@ -466,7 +481,7 @@ lemmas. Details, exact scope and existing evidence are in
 | PIOP and dimensions | Extra evaluation factor, Table-3 tensor/chunk mismatch, mux coordinate/index conventions and incorrect degree annotations. Checked counterexamples must remain visible. |
 | BAVC and BLC | Opening padding versus reconstruction bounds/queue logic, undefined nodes/aliases, differing hash payloads, missing recomputation names and the ill-typed Algorithm-12 line 21. |
 | PRG and challenges | Undefined block-size denominator, missing-tweak case, Category-III parse width, cipher material parsing, MapToBits/Extract, binary versus Gray interpretation, and counter behavior. |
-| Serialization | Exact byte encodings, field order, transcript boundaries, padding and parser policy; Category III has four spare secret-key bits. |
+| Serialization | Exact byte encodings, field order, transcript boundaries, padding and parser policy; Category III has four spare secret-key bits. The reduction's two injectivity hypotheses are discharged at the candidate bit-per-coordinate encoding (`CandidateSerialization`); its agreement with the implementation's packing is the review item. |
 | Parameters and reduction | Parameter prose contradicts Table 4; printed density floor/sign claims have counterexamples. §5.1 needs a valid probability argument and distribution/runtime correspondence; the event equality and universal conditional-uniqueness estimate cannot be assumed. |
 | Variants | Full algorithms absent from the outlines; nonzero amplitudes, concrete scalar representation, embedding and packing must be specified. |
 | Security assumptions | Adequacy of candidate hardness/oracle/machine models and their correspondence to the intended claim. The new abstract HashPiop domain is typed and separate from other oracle state; raw domain/encoding correspondence and faithful component instantiation remain unproved. Interaction fuel is not a runtime bound. No unproved reduction is an allowed assumption. |

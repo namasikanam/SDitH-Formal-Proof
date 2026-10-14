@@ -3357,6 +3357,39 @@ The final statement's named hypotheses are now: the data-level closeness
 seed-collision bound, the layout's injectivity and fiber bounds with the
 size conditions, and the structural hypotheses.
 
+## The candidate encoding and the distributional bound (continuation 336)
+
+`CandidateSerialization.candidateSerialization` is a named reading of the
+undefined wire encodings: one bit per coordinate in index order for
+vectors, and the base matrix flattened row, execution, bit. Its two
+injectivity facts (`sourceTail_injective`, `lines_injective`) discharge
+the encoding hypotheses of the composed bound, which is restated at the
+full layout as `forgery_le_final_full_enc`.
+
+`DistributionalFinal.averaged_forgery_le_final` is the composed bound
+with the setting, encoded public key and witness sampler drawn from a
+probability mass function on a finite index type: the forger's averaged
+advantage, minus the digest term, squared, is at most the budget squared
+times the explicit terms with the hardness term `εSD`, under
+`DistributionHard` (the witness-free solver's averaged syndrome-decoding
+success is at most `εSD` of the budget) and the per-instance structural
+hypotheses. `forgery_le_final_meanSquare` is the mean-square form over
+any distribution.
+
+Human review items: the candidate encoding is a reading, and its
+agreement with the implementation's byte packing (field order, padding)
+is unverified; the instance distribution is a parameter, since Algorithm
+2's literal routine returns no key (`B`, `x_A` undefined) and so its law
+cannot be formed without a decision; with a distribution fixed,
+`DistributionHard` is the natural place for a hardness assumption over
+instances, while `SDitH.Assumptions.SDHardness` (planted uniform matrices)
+remains unconsumed. On the named simulator constants: discharging them
+needs the challenge expansion modelled as a counted oracle of the digest
+and counter; with the deterministic expansion parameter the forger tries
+every counter for free, so no in-model bound is small. This is a
+decision about the model (a refactor of the settings), recorded in
+PLAN.md.
+
 ## The final statement at the full layout (continuation 335)
 
 `FullLayoutFinal.forgery_le_final_full` is the composed forgery bound

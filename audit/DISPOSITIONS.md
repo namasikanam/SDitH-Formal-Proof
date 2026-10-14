@@ -69,5 +69,7 @@ discharge the audit: the dispositions have to be reviewed by a person.
 | Retry bound `hretry` | assumption (challenge expansion not idealized). |
 | Mask-after-fork `εMask` | assumption (decision 1). |
 | Non-separation, zero challenge, Schwartz–Zippel, batching | assumption (challenge and batching expansions not idealized). |
-| Instance hardness `InstanceHard` | assumption on the fixed public instance; its relation to a distribution over instances is an obligation. |
+| Instance hardness `InstanceHard`, `DistributionHard` | assumption on the fixed public instance, or on an instance distribution given as a parameter (`DistributionalFinal`); forming Algorithm 2's own law is an obligation (undefined `B`, `x_A`). |
+| Encoding injectivity hypotheses | proved at the candidate bit-per-coordinate encoding (`CandidateSerialization.forgery_le_final_full_enc`); the encoding's agreement with the implementation's packing is an obligation. |
+| Expansion-dependent simulator constants and retry bound | assumption; discharging them needs the challenge expansion modelled as a counted oracle (a refactor of the settings), since the deterministic parameter lets the forger try every counter for free. |
 | Candidate scheme versus submitted routines | obligation (blocked by Algorithm 12's line 21 and seed array, the `Hashlines` payload, the undefined bindings). |

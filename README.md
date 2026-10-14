@@ -90,7 +90,12 @@ review table of `PLAN.md`.
 The composed forgery bound is
 `SDitH.Proofs.SeedTermDischarge.forgery_le_final_hard_C`, with its form at
 the submitted full layout `SDitH.Proofs.FullLayoutFinal.forgery_le_final_full`
-(the layout hypotheses discharged, fiber constants one). It is stated for the
+(the layout hypotheses discharged, fiber constants one), at the full layout
+and the candidate encoding
+`SDitH.Proofs.CandidateSerialization.forgery_le_final_full_enc` (the encoding
+hypotheses discharged), and averaged over a distribution of instances
+`SDitH.Proofs.DistributionalFinal.averaged_forgery_le_final` (the hardness
+assumption on the distribution). It is stated for the
 candidate scheme (the named corrected reading of the signer and verifier) in the
 shared ideal hash-and-cipher model, against a bounded adaptive chosen-message
 forger. It bounds the forger's squared advantage, minus the digest-guessing
@@ -127,6 +132,7 @@ from an idealization of the PRG or of the challenge and batching expansions:
 | `hretry` | The candidate retry returns at the digest except with probability εR. |
 | `SimulatorTermBounds5` (`SeedTermDischarge`) | The five simulator event probabilities are at most their named constants. Mask-after-fork is the hypothesis term of decision 1; the other four depend on the challenge and batching expansions. |
 | `InstanceHard` (`InstanceHardness`) | Every budgeted adversary's solver returns a weight-`w` solution of the key generation's instance with probability at most `εSD` of the budget. |
+| `DistributionHard` (`DistributionalFinal`) | The same averaged over the instance distribution: used by the averaged form of the bound in place of `InstanceHard`. |
 
 **Parameter conditions.** Injectivity and fiber bounds of the signer's and the
 verifier's cipher layouts (discharged at the full layout; the settings fix the
@@ -134,16 +140,20 @@ cipher's key and block width to λ, so the Category-III truncated layout is
 outside their type and the statement covers Categories I and V), the verifier's identity layout, the size conditions
 (26 ≤ λ, four times the leaf count ≤ 2^24, the budget-dependent counts below
 the number of seeds) and the structural hypotheses (the verifier's middle, the
-encoding injectivity facts, the candidate encoding, the budgets, at least one
-higher coefficient, the witness sampler's solutions, the verification budget
-within the commitment budget).
+encoding injectivity facts (discharged at the candidate bit-per-coordinate
+encoding of `CandidateSerialization`), the candidate challenge encoding, the
+budgets, at least one higher coefficient, the witness sampler's solutions, the
+verification budget within the commitment budget).
 
 **Not asserted.** That the key generation's instance is drawn from a hard
 distribution. `InstanceHard` is an assumption on the fixed instance of the
-setting and over the reduction's solvers; `SDHardness` in
-`SDitH/Assumptions.lean` is a definition over the planted distribution and is not
-consumed by any theorem, because the seed-expanded systematic instance is not
-related to that distribution and no runtime model exists. That correspondence, the correspondence of
+setting and over the reduction's solvers, and `DistributionHard` on an
+arbitrary instance distribution given as a parameter; Algorithm 2's own law
+is not formed, because the literal routine returns no key (`B`, `x_A`
+undefined). `SDHardness` in `SDitH/Assumptions.lean` is a definition over the
+planted distribution and is not consumed by any theorem, because the
+seed-expanded systematic instance is not related to that distribution and no
+runtime model exists. That correspondence, the correspondence of
 the candidate scheme to the submitted routines, and the ideal model's relation
 to concrete SHAKE and Rijndael are human review obligations recorded in
 `audit/HUMAN_REVIEW.md`.

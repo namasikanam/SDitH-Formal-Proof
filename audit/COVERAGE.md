@@ -4353,6 +4353,29 @@ witness-swap term remain the simulation gap's open terms.
 
 The hundred-and-ninety-first full validation passed: 3576 build jobs and 16194 project declarations audited, every transitive axiom allowlisted.
 
+## Continuation 336 — the candidate encoding and the distributional bound
+
+New modules: Proofs/CandidateSerialization and Proofs/DistributionalFinal,
+imported and indexed under the signature game.
+
+The candidate wire encoding, one bit per coordinate in index order
+(`bitVector`, `bitBase`, `candidateSerialization`), its injectivity facts
+(`bitVector_injective`, `bitBase_injective`, `flatten_ofFn_inj`,
+`sourceTail_injective`, `lines_injective`) and the composed bound at the
+full layout with the candidate encoding in place of the two encoding
+hypotheses (`forgery_le_final_full_enc`).
+
+The explicit terms of the bound as a function of the hardness term
+(`rhsTerms`, affine in it: `rhsTerms_add`), the averaged advantage and
+solver success over a distribution of instances (`averagedAdvantage`,
+`averagedRSD`), the distributional hardness assumption
+(`DistributionHard`), the mean-square form of the bound over any
+distribution (`forgery_le_final_meanSquare`) and, on a finite index type,
+the bound on the averaged advantage through the weighted power-mean
+inequality (`averaged_forgery_le_final`).
+
+The three-hundred-and-thirty-sixth full validation passed: 3755 build jobs and 19173 project declarations audited, every transitive axiom allowlisted.
+
 ## Continuation 335 — the final statement at the full layout
 
 New module: Proofs/FullLayoutFinal, imported and indexed under the

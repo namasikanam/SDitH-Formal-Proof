@@ -5265,6 +5265,39 @@ was added. Assumptions and Final are unchanged.
 
 The hundred-and-ninety-first full validation passed: 3576 build jobs and 16194 project declarations audited, every transitive axiom allowlisted.
 
+## Continuation 336 — the candidate encoding and the distributional bound
+
+Classified continuation 335 as progress and took its audit (3753 jobs,
+19149 declarations) as the starting state; verified this continuation's
+registration (import lines, index entries). The user asked which
+decisions to take and then said to continue; the defaults were: idealize
+the challenge and batching expansions, state hardness over the key
+generation's distribution, and fix a candidate serialization.
+
+Examined the first. With the expansion a deterministic parameter of the
+settings, the forger evaluates it at every counter without a query, so
+the non-separation, zero-challenge and Schwartz–Zippel events are unions
+over all counters: a balancedness hypothesis on the expansion would give
+bounds carrying the counter range as a factor, and the retry bound needs
+a joint statement over counters that per-counter balancedness does not
+give. Discharging these terms therefore needs the expansion modelled as
+a counted oracle of the digest and counter, which is a refactor of
+`SigningSetting` and `VerifierSetting` across the reduction, not a local
+proof. Recorded as the blocker in PLAN.md; the constants stay named.
+
+Added Proofs/CandidateSerialization: a bit-per-coordinate encoding and
+the two injectivity facts the final statement hypothesizes, and the
+full-layout bound restated with the candidate encoding. Added
+Proofs/DistributionalFinal: the bound averaged over an arbitrary
+distribution of (setting, public key, witness sampler) under a
+distributional hardness assumption, in mean-square form by linearity and,
+for a finite index type, on the averaged advantage by the weighted
+power-mean inequality. Algorithm 2's own law is not formed, because the
+literal routine reads the undefined `B` and `x_A`; the distribution is a
+parameter.
+
+The three-hundred-and-thirty-sixth full validation passed: 3755 build jobs and 19173 project declarations audited, every transitive axiom allowlisted.
+
 ## Continuation 335 — the final statement at the full layout
 
 Classified continuation 334 as progress and took its audit (3752 jobs,

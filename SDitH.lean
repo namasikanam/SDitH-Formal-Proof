@@ -479,3 +479,5 @@ import SDitH.Proofs.NamedSimulatorTerms
 import SDitH.Proofs.InstanceHardness
 import SDitH.Proofs.SeedTermDischarge
 import SDitH.Proofs.FullLayoutFinal
+import SDitH.Proofs.CandidateSerialization
+import SDitH.Proofs.DistributionalFinal

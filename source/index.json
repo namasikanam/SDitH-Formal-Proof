@@ -456,6 +456,8 @@
    "instance_hardness_proof": "SDitH/Proofs/InstanceHardness.lean",
    "seed_term_discharge_proof": "SDitH/Proofs/SeedTermDischarge.lean",
    "full_layout_final_proof": "SDitH/Proofs/FullLayoutFinal.lean",
+      "candidate_serialization_proof": "SDitH/Proofs/CandidateSerialization.lean",
+      "distributional_final_proof": "SDitH/Proofs/DistributionalFinal.lean",
    "oracle_trace_specification": "SDitH/Spec/RandomOracleTrace.lean",
    "oracle_trace_proof": "SDitH/Proofs/RandomOracleTrace.lean",
    "oracle_mention_specification": "SDitH/Spec/RandomOracleMention.lean",
