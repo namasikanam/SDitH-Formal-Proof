@@ -4353,6 +4353,51 @@ witness-swap term remain the simulation gap's open terms.
 
 The hundred-and-ninety-first full validation passed: 3576 build jobs and 16194 project declarations audited, every transitive axiom allowlisted.
 
+## Continuation 335 — the final statement at the full layout
+
+New module: Proofs/FullLayoutFinal, imported and indexed under the
+signature game.
+
+The full layout's input and key injectivity and the one-element fibers of
+its key, key-of-output and output maps, stated for any layout equal to it
+(`input_injective_of_eq`, `key_injective_of_eq`,
+`keyOutput_fiber_le_one_of_eq`, `key_fiber_le_one_of_eq`,
+`output_fiber_le_one_of_eq`), and the composed bound with both layouts
+the full layout and the fiber constants one (`forgery_le_final_full`).
+
+The three-hundred-and-thirty-fifth full validation passed: 3753 build jobs and 19149 project declarations audited, every transitive axiom allowlisted.
+
+## Continuation 334 — the simulator's seed-collision term discharged
+
+New module: Proofs/SeedTermDischarge, imported and indexed under the
+signature game.
+
+The per-event simulation-gap statement with the seed collision bounded in
+the real experiment instead of transferred to the simulator
+(`forgery_le_simulated_events_C`), the regenerated chain of final
+statements with that summand the explicit pair cost
+(`forgery_le_final_close_C`, `_data_C`, `_hide_C`, `_coll_C`,
+`_rsd_C`, `_named_C`), the five-constant simulator hypothesis
+(`SimulatorTermBounds5`) and the final statement
+(`forgery_le_final_hard_C`).
+
+The three-hundred-and-thirty-fourth full validation passed: 3752 build jobs and 19143 project declarations audited, every transitive axiom allowlisted.
+
+## Continuation 333 — the hardness assumption on the instance
+
+New module: Proofs/InstanceHardness, imported and indexed under the
+signature game.
+
+The named hardness assumption on the key generation's instance
+(`InstanceHard`: every budgeted adversary's solver returns a weight-`w`
+solution of the public instance with probability at most `εSD` of the
+budget) and the final statement with the hardness term replaced by it
+(`forgery_le_final_hard`). The source index's Algorithm-12 entry gained a
+`reduction_status` field with the current state; Algorithms 3 and 4 point
+to it.
+
+The three-hundred-and-thirty-third full validation passed: 3751 build jobs and 19134 project declarations audited, every transitive axiom allowlisted.
+
 ## Continuation 332 — review pass
 
 No new module. The README status summary, the plan's open lines of the

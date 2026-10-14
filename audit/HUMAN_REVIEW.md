@@ -3357,6 +3357,68 @@ The final statement's named hypotheses are now: the data-level closeness
 seed-collision bound, the layout's injectivity and fiber bounds with the
 size conditions, and the structural hypotheses.
 
+## The final statement at the full layout (continuation 335)
+
+`FullLayoutFinal.forgery_le_final_full` is the composed forgery bound
+with both cipher layouts equal to the submitted full layout
+(`fullLayout lambda = ⟨id, id, id⟩`, Categories I and V): the seven
+layout hypotheses (the signer's input injectivity and the fiber bounds of
+its key-of-output, key and output maps; the verifier's input and key
+injectivity and output fiber bound) are discharged and the fiber
+constants are one, so the size conditions read
+`commitBudget·(3(fuel+1)+2) + 1 + 2·τ·2^κ + 1 < 2^λ` and
+`commitBudget·(3(fuel+1)+2) + 2·τ·2^κ < 2^λ`.
+
+Human review items: the settings fix the cipher's key and block width to
+the security parameter (`Layout lambda (Bits lambda) (Bits lambda)`), so
+the submitted Category-III layout (`truncatedLayout : Layout 192 (Bits 256)
+(Bits 256)`, 192-bit seeds in 256-bit blocks) is outside the type of the
+reduction's settings: the reduction as stated covers the full-layout
+categories (I and V); extending the settings to a separate block width is
+a scope item, not a decision. The generic statement is kept for layouts of
+the setting's type other than the identity.
+
+## The simulator's seed-collision term is discharged (continuation 334)
+
+`SeedTermDischarge.forgery_le_final_hard_C` is the composed forgery bound
+with the simulated seed-collision term removed: the seed-collision event
+is a cipher event (two recorded seeds with colliding commitments), so its
+bound in the real experiment through the ideal cipher's pair mass
+(`SeedCollisionBound.seedCollision_le`, continuation 320) is used
+directly in the per-event split, and no simulated copy of the event is
+needed. The earlier final statements carried the simulated copy as a
+leftover slack of the generic event transfer. The named simulator
+constants are now five, in `SimulatorTermBounds5`: mask-after-fork,
+non-separation, zero-challenge, Schwartz–Zippel and batching.
+
+Human review items: of the five, mask-after-fork is the hypothesis term
+of decision 1 (a branch's mask input first queried after the fork), and
+the other four depend on the challenge and batching expansions' model.
+None is a cipher event, so no further term of the statement is
+dischargeable by the ideal-cipher arguments alone.
+
+## The hardness assumption on the instance (continuation 333)
+
+`InstanceHardness.forgery_le_final_hard` is the composed forgery bound
+with the solver's syndrome-decoding success replaced by `εSD fuel`, under
+`InstanceHard S V verifyBudget publicKey sampleWitness εSD`: for every
+adversary (any state type at the fixed universe), budget and `0 < tau`,
+the witness-free solver built from that adversary returns a weight-`w`
+solution of `instanceOf S.H' S.y` with probability at most `εSD fuel`.
+
+Human review items: this is a hardness assumption on the fixed public
+instance of the signing setting, in the style of a non-uniform assumption
+on one instance, and it is quantified over solvers of the specific shape
+produced by the reduction (the simulated fork experiment of an adversary),
+not over arbitrary algorithms; a standard assumption would be stated over
+a distribution of instances (`SDitH.Assumptions.SDHardness` is such a
+statement, over the planted distribution) and over all algorithms within a
+runtime bound. Neither gap is closable in the current model: the key
+generation's instance is seed-expanded and systematic, not planted, and no
+runtime model exists. The assumption is therefore the simplest named form
+that makes the final statement explicit, and its adequacy is a review
+decision.
+
 ## Review pass (continuation 332)
 
 Checked for human review: the final statement

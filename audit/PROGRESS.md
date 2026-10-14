@@ -5265,6 +5265,60 @@ was added. Assumptions and Final are unchanged.
 
 The hundred-and-ninety-first full validation passed: 3576 build jobs and 16194 project declarations audited, every transitive axiom allowlisted.
 
+## Continuation 335 — the final statement at the full layout
+
+Classified continuation 334 as progress and took its audit (3752 jobs,
+19143 declarations) as the starting state; verified this continuation's
+registration (import line, index entry). The layout facts are proved for
+a layout variable equal to the full layout (so `subst` applies), and the
+fiber bounds go through the subsingleton form, which is independent of
+the subtype's decidability instance. Generation by substitution needed
+word boundaries on the constant names (a bare replacement of `cKey` had
+hit `publicKey`).
+
+Added Proofs/FullLayoutFinal. The seven layout hypotheses of the generic
+statement are discharged at the submitted full layout (Categories I and
+V). Found while writing the review note that the settings' layout type
+fixes the key and block width to λ, so the Category-III truncated layout
+is outside the reduction's settings; recorded as a scope item.
+
+The three-hundred-and-thirty-fifth full validation passed: 3753 build jobs and 19149 project declarations audited, every transitive axiom allowlisted.
+
+## Continuation 334 — the simulator's seed-collision term discharged
+
+Classified continuation 333 as progress and took its audit (3751 jobs,
+19134 declarations) as the starting state; verified this continuation's
+registration (import line, index entry). Found on review that the
+simulated seed-collision term of the final statement was never needed:
+the real-experiment seed-collision bound (`seedCollision_le`) was already
+used to discharge that event's gap hypothesis, with the simulated term
+kept only as slack. Regenerated the chain from the per-event gaps with
+the seed summand free, then instantiated it with the pair cost; the
+generation is by substitution from the existing modules, and the proofs
+are unchanged apart from the dropped gap argument.
+
+Added Proofs/SeedTermDischarge. The named simulator constants are now
+five (mask-after-fork, non-separation, zero-challenge, Schwartz–Zippel,
+batching); the seed collision is a proved term.
+
+The three-hundred-and-thirty-fourth full validation passed: 3752 build jobs and 19143 project declarations audited, every transitive axiom allowlisted.
+
+## Continuation 333 — the hardness assumption on the instance
+
+Classified continuation 332 as progress and took its audit (3750 jobs,
+19132 declarations) as the starting state; verified this continuation's
+registration (import line, index entry). The assumption is quantified
+over every adversary at a fixed universe, so the module fixes the
+adversary state's universe explicitly and the final statement instantiates
+it. The proof is the previous final statement and monotonicity of the sum.
+
+Added Proofs/InstanceHardness. Track A's right-hand side is now entirely
+named constants and proved slacks. The remaining Track A items are the
+hardness-distribution correspondence (a decision) and the
+candidate-to-submission correspondence (blocked on Track B).
+
+The three-hundred-and-thirty-third full validation passed: 3751 build jobs and 19134 project declarations audited, every transitive axiom allowlisted.
+
 ## Continuation 332 — review pass
 
 Classified continuation 331 as progress and took its audit (3750 jobs,

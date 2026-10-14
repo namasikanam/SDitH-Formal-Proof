@@ -476,3 +476,6 @@ import SDitH.Proofs.MuxSelect
 import SDitH.Proofs.SolutionRegular
 import SDitH.Proofs.ForgeryRSD
 import SDitH.Proofs.NamedSimulatorTerms
+import SDitH.Proofs.InstanceHardness
+import SDitH.Proofs.SeedTermDischarge
+import SDitH.Proofs.FullLayoutFinal

@@ -1,8 +1,8 @@
 # SDitH formalization plan and checklist
 
-Last updated: 2026-10-13.
+Last updated: 2026-10-14.
 
-The latest full validation passed **3,750 build jobs and audited 19,132 project
+The latest full validation passed **3,753 build jobs and audited 19,149 project
 declarations**. This checks the current development, not whole-scheme correctness
 or security. See [validation output](audit/validation.log).
 
@@ -12,10 +12,12 @@ two-track summary first; the detailed checklists follow it.
 ## Two-track summary
 
 **Track A, the security reduction: complete modulo named assumptions.**
-The composed EUF-CMA bound `NamedSimulatorTerms.forgery_le_final_named` is
-proved for the candidate scheme in the ideal hash-and-cipher model. Every term
-of its right-hand side is either proved or one of four named hypotheses
-(`DataClose`, `LeafHide`, `hretry`, `SimulatorTermBounds`), kept as explicit
+The composed EUF-CMA bound `SeedTermDischarge.forgery_le_final_hard_C` is
+proved for the candidate scheme in the ideal hash-and-cipher model, and
+`FullLayoutFinal.forgery_le_final_full` is its form at the submitted full
+layout with the layout hypotheses discharged. Every term
+of its right-hand side is either proved or one of five named hypotheses
+(`DataClose`, `LeafHide`, `hretry`, `SimulatorTermBounds5`, `InstanceHard`), kept as explicit
 cryptographic assumptions by the decision of 2026-10-12 rather than derived
 from an idealization of the PRG or the challenge and batching expansions. No
 further proof work is scheduled on this track unless that decision changes.
@@ -40,7 +42,7 @@ percentage.
 ## Track A — the security reduction
 
 Status: complete modulo the named assumptions. Final statement
-`NamedSimulatorTerms.forgery_le_final_named`; the per-term checklist is in
+`SeedTermDischarge.forgery_le_final_hard_C`; the per-term checklist is in
 "Explicit terms of the composed forgery bound" below.
 
 - [x] Forgery-to-fork with useful-query selection and replay; extraction from
@@ -51,20 +53,27 @@ Status: complete modulo the named assumptions. Final statement
   regular syndrome-decoding solution of the public instance.
 - [ ] Named hypotheses, open by decision (each needs an idealization not
   adopted): `DataClose` and `LeafHide` (the PRG), `hretry` (the challenge
-  expansion), `SimulatorTermBounds` (the challenge and batching expansions).
+  expansion), `SimulatorTermBounds5` (mask-after-fork by decision 1; the
+  other four need the challenge and batching expansions).
   If the decision changes, each is a well-scoped proof project that leaves the
   rest of the final statement untouched.
+- [x] Hardness as a named assumption: `InstanceHard` bounds every budgeted
+  adversary's solver on the key generation's fixed instance by `εSD`, and
+  the final statement carries `εSD` in place of the solver's success.
 - [ ] Hardness distribution (a modelling decision, review table row "Sampler
-  and keygen"): the hardness term `rsdSuccess` is stated on the fixed public
-  instance of the setting; `SDitH.Assumptions.SDHardness` is stated over the
-  planted distribution; nothing relates the key generation's seed-expanded
-  systematic instance to that distribution.
+  and keygen"): `InstanceHard` is stated on the fixed public instance of the
+  setting and over the reduction's solvers; `SDitH.Assumptions.SDHardness`
+  is stated over the planted distribution and a solver family; nothing
+  relates the key generation's seed-expanded systematic instance to that
+  distribution, and no runtime model exists.
 - [ ] Correspondence of the candidate scheme (`CandidateScheme`,
   `CandidateVerifier`, `CandidateBAVC`) to the submitted routines: blocked by
   the source defects of Track B (Algorithm 12's seed array and line 21, the
   `Hashlines` payload, the undefined bindings).
 - Not in scope of the model: a runtime or machine model. The budget counts
   oracle actions, so the statement is not a concrete-time EUF-CMA bound.
+- Not in scope of the settings: Category III's truncated cipher layout
+  (block width 256 at λ = 192); the settings fix key and block width to λ.
 
 ## Track B — whole-scheme formalization
 
@@ -112,7 +121,9 @@ the reduction that the source only outlines.
    algorithm, equation, table and substantive claim with a proved statement,
    an explicit assumption, a checked refutation, or a documented obligation.
    The inputs for this exist (`source/index.json`, `audit/COVERAGE.md`,
-   `audit/HUMAN_REVIEW.md`); the dispositions have to be reviewed by a person.
+   `audit/HUMAN_REVIEW.md`), and `audit/DISPOSITIONS.md` tabulates a proposed
+   disposition (proved, assumption, refuted, obligation) for every source
+   item; the dispositions have to be reviewed by a person.
 
 Dependency order within Track B: decisions (item 1) → concrete execution
 (item 2) → honest correctness (item 3); items 5 and 6 are independent of that
@@ -373,7 +384,7 @@ chain; item 7 closes after the others.
 
 ## Explicit terms of the composed forgery bound
 
-The final statement is `NamedSimulatorTerms.forgery_le_final_named`. Each line
+The final statement is `SeedTermDischarge.forgery_le_final_hard_C`. Each line
 is one term of its right-hand side or one of its hypotheses.
 
 - [x] Fork-and-extract core: forgery-to-fork at a uniform useful index, the
@@ -388,7 +399,8 @@ is one term of its right-hand side or one of its hypotheses.
 - [x] The hardness term: an extracted witness with zero mux residual and
   unitary selectors is a weight-`w` solution of the key generation's instance
   `instanceOf H' y` (`SolutionRegular.isSolution_sd`), so the solver's success
-  is at most `rsdSuccess` (`ForgeryRSD`).
+  is at most `rsdSuccess` (`ForgeryRSD`), which the named assumption
+  `InstanceHard` bounds by `εSD fuel` (`InstanceHardness`).
 - [x] Simulation gap, proved parts: the honest signing unfolds to the
   commitment run, the PIOP query and the opening; the input-present term is
   the prefix's mention steps plus the row-stored term plus the support count
@@ -415,7 +427,8 @@ is one term of its right-hand side or one of its hypotheses.
     probability εR. Needs the challenge expansion's model.
 - [x] Seed collision across the two branches: the explicit pair cost
   `εCollOf` through the posterior pair mass over the oracles, the game run,
-  the cut, a fresh branch and the restored fork.
+  the cut, a fresh branch and the restored fork; the simulated copy of the
+  event is not needed and no longer appears (`SeedTermDischarge`).
 - [x] Slope-game win: the stored-mask event is covered by the mask trap, the
   witnessed pair and the unseen match; each is bounded in the real experiment
   (the trace trap bound, the family-dependent fork bound with the pair-mass
@@ -423,18 +436,23 @@ is one term of its right-hand side or one of its hypotheses.
   `(fuel+1)·2·εTrap + εWitOf + unseenCost` under the verifier's identity
   layout.
 - [ ] Expansion-dependent simulator events, carried as the named constants of
-  `SimulatorTermBounds`: mask-after-fork (`εMask`), non-separation (`εSep`),
-  the simulator's seed collision (`εSeed`), zero challenge (`εZero`),
-  Schwartz–Zippel (`εSZ`), batching (`εBatch`). Each is a probability of the
-  witness-free simulator; with the challenge and batching expansions
-  idealized they would be per-attempt small-support counts. Not dischargeable
-  with the deterministic expansion parameters.
+  `SimulatorTermBounds5`: mask-after-fork (`εMask`, decision 1),
+  non-separation (`εSep`), zero challenge (`εZero`), Schwartz–Zippel
+  (`εSZ`), batching (`εBatch`). Each is a probability of the witness-free
+  simulator; with the challenge and batching expansions idealized the last
+  four would be per-attempt small-support counts. Not dischargeable with
+  the deterministic expansion parameters.
 - [x] Layout and size conditions, stated as hypotheses: the signer's input
   injectivity and the fiber bounds of its key and output maps; the verifier's
   identity layout, injective input and key maps and output fiber bound;
   26 ≤ λ, four times the leaf count ≤ 2^24, the budget-dependent counts below
-  the number of seeds. Both submitted layouts are proved to satisfy the
-  injectivity and uniformity facts used.
+  the number of seeds. At the submitted full layout the seven layout
+  hypotheses are discharged with fiber constants one
+  (`FullLayoutFinal.forgery_le_final_full`). The settings fix the cipher's
+  key and block width to λ, so the Category-III truncated layout (192-bit
+  seeds in 256-bit blocks) is outside their type: the reduction covers
+  Categories I and V as stated; Category III needs the settings extended
+  to a separate block width (scope item, Track B).
 
 ## Human/source decisions — separate from proof tasks
 
