@@ -5265,6 +5265,17 @@ was added. Assumptions and Final are unchanged.
 
 The hundred-and-ninety-first full validation passed: 3576 build jobs and 16194 project declarations audited, every transitive axiom allowlisted.
 
+## Continuation 337 — assumption-boundary docstring refreshed
+
+Classified continuation 336 as progress and took its audit (3755 jobs,
+19173 declarations) as the starting state. Replaced the "state at
+continuation 331" paragraph of the `SDitH/Assumptions.lean` docstring with
+the state after continuation 336 (final statements, named hypotheses, the
+counted-oracle finding, the unformed key-generation law). Documentation
+only; rebuilt and validated because the file is Lean source.
+
+The three-hundred-and-thirty-seventh full validation passed: 3755 build jobs and 19173 project declarations audited, every transitive axiom allowlisted.
+
 ## Continuation 336 — the candidate encoding and the distributional bound
 
 Classified continuation 335 as progress and took its audit (3753 jobs,

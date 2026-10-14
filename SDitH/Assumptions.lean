@@ -24,19 +24,23 @@ theorems. They must not be used as names for unproved reductions or conclusions.
 In particular the heuristic step in §5.1 and missing EUF-CMA reduction are NOT
 assumptions admitted by this file. See `audit/HUMAN_REVIEW.md`.
 
-State at continuation 331: the composed forgery bound
-`SDitH.Proofs.NamedSimulatorTerms.forgery_le_final_named` carries its
-cryptographic hypotheses as explicit theorem parameters, each a named
-definition in the proof modules: `OffHitAssembly.DataClose` (data-level
-closeness of the honest and fake signings at uniform hidden blocks),
-`LeafTermBound.LeafHide` (the hidden leaf's key unpredictable at uniform
-blocks), the retry bound `hretry` and `NamedSimulatorTerms.SimulatorTermBounds`
-(the witness-free simulator's six expansion-dependent event
-probabilities). Its hardness term is `ForgeryRSD.rsdSuccess`, the solver's
-probability of returning a weight-`w` solution of the key generation's
-instance (`Spec.KeyGeneration.instanceOf`), on the fixed public instance of the
-setting; `SDHardness` below is still not consumed, because the key generation's
-seed-expanded systematic instance is not related to `plantedSD`.
+State at continuation 336: the composed forgery bound
+`SDitH.Proofs.SeedTermDischarge.forgery_le_final_hard_C` (generic layouts),
+`SDitH.Proofs.CandidateSerialization.forgery_le_final_full_enc` (the full
+layout and a named bit-per-coordinate encoding) and
+`SDitH.Proofs.DistributionalFinal.averaged_forgery_le_final` (averaged over an
+instance distribution) carry their cryptographic hypotheses as explicit
+theorem parameters, each a named definition in the proof modules:
+`OffHitAssembly.DataClose` and `LeafTermBound.LeafHide` (the PRG not
+idealized), the retry bound `hretry` and `SeedTermDischarge.SimulatorTermBounds5`
+(the challenge and batching expansions are deterministic parameters that the
+forger evaluates at every counter without a query, so these stay named until
+the expansion is modelled as a counted oracle), and the hardness assumption
+`InstanceHardness.InstanceHard` on the fixed public instance
+`Spec.KeyGeneration.instanceOf`, or `DistributionalFinal.DistributionHard` on
+an instance distribution given as a parameter. `SDHardness` below is still not
+consumed: Algorithm 2's literal routine returns no key (`B`, `x_A` undefined),
+so its instance law is not formed, and nothing relates it to `plantedSD`.
 -/
 
 namespace SDitH.Assumptions

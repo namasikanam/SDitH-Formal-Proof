@@ -4353,6 +4353,16 @@ witness-swap term remain the simulation gap's open terms.
 
 The hundred-and-ninety-first full validation passed: 3576 build jobs and 16194 project declarations audited, every transitive axiom allowlisted.
 
+## Continuation 337 — assumption-boundary docstring refreshed
+
+No new module. The module docstring of `SDitH/Assumptions.lean` now states
+the current boundary: the three final statements, their named hypotheses
+(`DataClose`, `LeafHide`, `hretry`, `SimulatorTermBounds5`, `InstanceHard`
+or `DistributionHard`), the reason the expansion-dependent constants stay
+named, and why `SDHardness` is still unconsumed. No declaration changed.
+
+The three-hundred-and-thirty-seventh full validation passed: 3755 build jobs and 19173 project declarations audited, every transitive axiom allowlisted.
+
 ## Continuation 336 — the candidate encoding and the distributional bound
 
 New modules: Proofs/CandidateSerialization and Proofs/DistributionalFinal,
