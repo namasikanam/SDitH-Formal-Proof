@@ -45,7 +45,7 @@ formalization complete.
 | `SDitH/Proofs/` | All proofs. Every module is imported by `SDitH.lean` and listed in `source/index.json`. |
 | `SDitH/Assumptions.lean` | The standalone assumption interface: candidate readings of the submission's §5.3 assumptions (planted syndrome decoding, lazy random oracle, ideal cipher, their joint model). It declares no axiom. |
 | `SDitH/Final.lean` | The public theorem interface: three discrepancy theorems, nothing else. |
-| `audit/` | `COVERAGE.md` (what each module establishes), `PROGRESS.md` (chronological record), `HUMAN_REVIEW.md` (source-correspondence and review obligations), `Axioms.lean`, `validation.log`, and the archived earlier versions of this file and of `PLAN.md`. |
+| `audit/` | `COVERAGE.md` (what each module establishes), `PROGRESS.md` (chronological record), `HUMAN_REVIEW.md` (source-correspondence and review obligations), `DISPOSITIONS.md` (proposed disposition of every source item, for the review audit), `Axioms.lean`, `validation.log`, `REPORT.pdf` (the paper-to-theorem report: how each step of the security argument corresponds to a Lean theorem), and the archived earlier versions of this file and of `PLAN.md`. |
 | `PLAN.md` | The checklist of completed components, remaining work, the composed bound's terms, the review table and the completion gates. |
 
 ## Conventions
@@ -88,22 +88,24 @@ review table of `PLAN.md`.
 ### The security reduction
 
 The composed forgery bound is
-`SDitH.Proofs.NamedSimulatorTerms.forgery_le_final_named`. It is stated for the
+`SDitH.Proofs.SeedTermDischarge.forgery_le_final_hard_C`, with its form at
+the submitted full layout `SDitH.Proofs.FullLayoutFinal.forgery_le_final_full`
+(the layout hypotheses discharged, fiber constants one). It is stated for the
 candidate scheme (the named corrected reading of the signer and verifier) in the
 shared ideal hash-and-cipher model, against a bounded adaptive chosen-message
 forger. It bounds the forger's squared advantage, minus the digest-guessing
 term, by the budget squared times an explicit sum of:
 
-- six named constants bounding the witness-free simulator's expansion-dependent
-  events (mask-after-fork, non-separation, seed-collision, zero-challenge,
-  Schwartz–Zippel, batching);
+- five named constants bounding the witness-free simulator's events
+  (mask-after-fork, non-separation, zero-challenge, Schwartz–Zippel,
+  batching);
 - proved slacks: the per-event simulation slack (input-present, row-stored,
   staleness, retry, touching and leaf terms), the seed-collision pair cost,
   the slope-game slack (mask trap, witnessed pair, unseen match), and the
   mention, collision and digest terms of the fork-and-extract core;
-- the solver's syndrome-decoding success `rsdSuccess`: the probability that
-  the witness-free solver returns a weight-`w` solution of the key
-  generation's instance `instanceOf H' y`.
+- the named hardness bound `εSD` on the solver's syndrome-decoding success
+  `rsdSuccess`, the probability that the witness-free solver returns a
+  weight-`w` solution of the key generation's instance `instanceOf H' y`.
 
 **Proved in the model.** The forgery-to-fork step with useful-query selection
 and replay, extraction of a witness line from two accepted transcripts, the
@@ -123,20 +125,25 @@ from an idealization of the PRG or of the challenge and batching expansions:
 | `DataClose` (`OffHitAssembly`) | With the hidden leaves' blocks replaced by a uniform tuple, the honest signing's data is within an explicit slack of the fake signing's: ideal-model honest-verifier zero knowledge at uniform hidden blocks. |
 | `LeafHide` (`LeafTermBound`) | With the hidden leaves replaced by uniform blocks, a continuation records a replaced block's key with probability at most δ. |
 | `hretry` | The candidate retry returns at the digest except with probability εR. |
-| `SimulatorTermBounds` (`NamedSimulatorTerms`) | The six simulator event probabilities are at most their named constants. |
+| `SimulatorTermBounds5` (`SeedTermDischarge`) | The five simulator event probabilities are at most their named constants. Mask-after-fork is the hypothesis term of decision 1; the other four depend on the challenge and batching expansions. |
+| `InstanceHard` (`InstanceHardness`) | Every budgeted adversary's solver returns a weight-`w` solution of the key generation's instance with probability at most `εSD` of the budget. |
 
 **Parameter conditions.** Injectivity and fiber bounds of the signer's and the
-verifier's cipher layouts, the verifier's identity layout, the size conditions
+verifier's cipher layouts (discharged at the full layout; the settings fix the
+cipher's key and block width to λ, so the Category-III truncated layout is
+outside their type and the statement covers Categories I and V), the verifier's identity layout, the size conditions
 (26 ≤ λ, four times the leaf count ≤ 2^24, the budget-dependent counts below
 the number of seeds) and the structural hypotheses (the verifier's middle, the
 encoding injectivity facts, the candidate encoding, the budgets, at least one
 higher coefficient, the witness sampler's solutions, the verification budget
 within the commitment budget).
 
-**Not asserted.** That the syndrome-decoding instance is hard. `SDHardness` in
+**Not asserted.** That the key generation's instance is drawn from a hard
+distribution. `InstanceHard` is an assumption on the fixed instance of the
+setting and over the reduction's solvers; `SDHardness` in
 `SDitH/Assumptions.lean` is a definition over the planted distribution and is not
-consumed by any theorem: the key generation's seed-expanded systematic instance
-is not related to that distribution. That correspondence, the correspondence of
+consumed by any theorem, because the seed-expanded systematic instance is not
+related to that distribution and no runtime model exists. That correspondence, the correspondence of
 the candidate scheme to the submitted routines, and the ideal model's relation
 to concrete SHAKE and Rijndael are human review obligations recorded in
 `audit/HUMAN_REVIEW.md`.
