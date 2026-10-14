@@ -5265,6 +5265,41 @@ was added. Assumptions and Final are unchanged.
 
 The hundred-and-ninety-first full validation passed: 3576 build jobs and 16194 project declarations audited, every transitive axiom allowlisted.
 
+## Continuation 338 — single-execution extraction
+
+Classified continuation 337 as progress and took its audit (3755 jobs,
+19173 declarations) as the starting state; verified this continuation's
+registration (import lines, index entries). The user gave full permission
+and asked that everything be proved; two surveys were run first.
+
+Finding on the existing statement: the non-separation event
+(`notSeparated`, hidden tuples agreeing at some execution) can be forced
+by a forger that grinds the counter of its second-branch forgery, and
+even with uniform challenges it has probability about τ/2^κ, so the named
+constant `εSep` cannot be small and the bound was structurally weak.
+The extraction needed separation at every execution because it read the
+slope of every execution from the completed seed array.
+
+Redesign: the extracted slope is the first branch's slope at one
+separated execution; the lines' slope coefficient is defined from the
+first branch's share matrix so that its values are the lines at its
+inverted challenge by construction. The deterministic extraction then
+uses only the first branch's acceptance, and the bad event becomes the
+full agreement of the two tuples (`allAgree`). The Schwartz–Zippel and
+batching events carry the negations of the prior events and stay in the
+real experiment as named constants; the solution event is transferred to
+the simulator as before. The hypotheses `hencode` and `hlayoutV` of the
+old chain are no longer needed. The slope-game and seed-collision terms
+keep their real-experiment bounds in the statement. The old chain is kept.
+
+Finding on the PRG side (survey): the signer's PRG is a supplied function,
+not a cipher call; `PRGUniform` is unsatisfiable when the random vector is
+longer than the seed; `DataClose` is stated pointwise in the family and
+`LeafHide` over arbitrary continuations, so both look satisfiable only
+with δ near one. Recorded in HUMAN_REVIEW.md as the next design item.
+
+The three-hundred-and-thirty-eighth full validation passed: 3757 build jobs and 19261 project declarations audited, every transitive axiom allowlisted.
+
 ## Continuation 337 — assumption-boundary docstring refreshed
 
 Classified continuation 336 as progress and took its audit (3755 jobs,

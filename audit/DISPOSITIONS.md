@@ -64,7 +64,7 @@ discharge the audit: the dispositions have to be reviewed by a person.
 
 | Item | Disposition |
 |---|---|
-| Composed EUF-CMA bound for the candidate scheme | proved (`SeedTermDischarge.forgery_le_final_hard_C`; at the full layout `FullLayoutFinal.forgery_le_final_full`). |
+| Composed EUF-CMA bound for the candidate scheme | proved (`SepChain.forgery_le_final_hard`, single-execution extraction; at the full layout and candidate encoding `SepChain.forgery_le_final_full_enc`; the earlier every-execution chain `SeedTermDischarge.forgery_le_final_hard_C` is kept but its non-separation constant is forceable). |
 | Data-level closeness `DataClose`, leaf hiding `LeafHide` | assumption (PRG not idealized). |
 | Retry bound `hretry` | assumption (challenge expansion not idealized). |
 | Mask-after-fork `εMask` | assumption (decision 1). |

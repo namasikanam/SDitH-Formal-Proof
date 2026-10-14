@@ -4353,6 +4353,34 @@ witness-swap term remain the simulation gap's open terms.
 
 The hundred-and-ninety-first full validation passed: 3576 build jobs and 16194 project declarations audited, every transitive axiom allowlisted.
 
+## Continuation 338 — single-execution extraction
+
+New modules: Proofs/SepEvents and Proofs/SepChain, imported and indexed
+under the signature game.
+
+SepEvents: the separation predicate (`SepAt`), the full-agreement event
+(`allAgree`), the chosen separated execution (`sepIndex`, `sepIndex_sep`),
+the extracted slope and witness (`uOf`, `xOf`), the lines' slope
+coefficient (`mCoef`), the extracted lines (`witnessLineM`,
+`randomnessLineM`, `witnessLineM_constant`) and the difference polynomial
+(`differenceM`); the first branch's values are the lines at its inverted
+challenge by construction (`verifier_eq_lines`) and vanish there on
+acceptance (`differenceM_vanishes`); the events with the prior events'
+negations (`priorOK`, `realOK`, `szPlus`, `batchingPlus`, `rsdSolvedPlus`,
+`priorBad`, `unionEvent`); the union (`good_implies_events`,
+`fork_le_union`, `random_fork_le_union`, `forgery_le_events`); the
+requirements (`eventOKP_allAgree`, `eventOKP_rsdSolvedPlus`); the solver
+(`solverOutput`, `solver`, `solverSuccess`, `rsdSolvedPlus_output`,
+`solverSuccess_ge`, `rsdSuccess`, `solverSuccess_le_rsd`).
+
+SepChain: the chain for these events (`forgery_le_simulated_events`,
+`forgery_le_final_close`, `_data`, `_hide`, `_coll`, `_rsd`), the named
+constants (`SimulatorTermBounds3`, `RealTermBounds`, `forgery_le_final_named`),
+the hardness assumption and the final statements (`InstanceHard`,
+`forgery_le_final_hard`, `forgery_le_final_full_enc`).
+
+The three-hundred-and-thirty-eighth full validation passed: 3757 build jobs and 19261 project declarations audited, every transitive axiom allowlisted.
+
 ## Continuation 337 — assumption-boundary docstring refreshed
 
 No new module. The module docstring of `SDitH/Assumptions.lean` now states

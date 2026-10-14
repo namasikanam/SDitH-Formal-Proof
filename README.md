@@ -87,15 +87,19 @@ review table of `PLAN.md`.
 
 ### The security reduction
 
-The composed forgery bound is
-`SDitH.Proofs.SeedTermDischarge.forgery_le_final_hard_C`, with its form at
-the submitted full layout `SDitH.Proofs.FullLayoutFinal.forgery_le_final_full`
-(the layout hypotheses discharged, fiber constants one), at the full layout
-and the candidate encoding
-`SDitH.Proofs.CandidateSerialization.forgery_le_final_full_enc` (the encoding
-hypotheses discharged), and averaged over a distribution of instances
-`SDitH.Proofs.DistributionalFinal.averaged_forgery_le_final` (the hardness
-assumption on the distribution). It is stated for the
+The composed forgery bound is `SDitH.Proofs.SepChain.forgery_le_final_hard`
+(single-execution extraction), with its form at the submitted full layout
+and the candidate encoding `SDitH.Proofs.SepChain.forgery_le_final_full_enc`.
+Its bad events are the mask after the fork, the two branches' hidden tuples
+agreeing at every execution, the seed collision, the mask trap, the witnessed
+pair, the unseen match, the zero challenge, the Schwartz–Zippel event and the
+batching event. The earlier chain, whose extraction needed the tuples to
+differ at every execution, is kept
+(`SeedTermDischarge.forgery_le_final_hard_C`, `FullLayoutFinal`,
+`CandidateSerialization.forgery_le_final_full_enc`,
+`DistributionalFinal.averaged_forgery_le_final`); its non-separation
+constant can be forced by a forger that grinds its counter, so those
+statements are weak. It is stated for the
 candidate scheme (the named corrected reading of the signer and verifier) in the
 shared ideal hash-and-cipher model, against a bounded adaptive chosen-message
 forger. It bounds the forger's squared advantage, minus the digest-guessing
@@ -130,8 +134,10 @@ from an idealization of the PRG or of the challenge and batching expansions:
 | `DataClose` (`OffHitAssembly`) | With the hidden leaves' blocks replaced by a uniform tuple, the honest signing's data is within an explicit slack of the fake signing's: ideal-model honest-verifier zero knowledge at uniform hidden blocks. |
 | `LeafHide` (`LeafTermBound`) | With the hidden leaves replaced by uniform blocks, a continuation records a replaced block's key with probability at most δ. |
 | `hretry` | The candidate retry returns at the digest except with probability εR. |
-| `SimulatorTermBounds5` (`SeedTermDischarge`) | The five simulator event probabilities are at most their named constants. Mask-after-fork is the hypothesis term of decision 1; the other four depend on the challenge and batching expansions. |
-| `InstanceHard` (`InstanceHardness`) | Every budgeted adversary's solver returns a weight-`w` solution of the key generation's instance with probability at most `εSD` of the budget. |
+| `SimulatorTermBounds3` (`SepChain`) | The simulated probabilities of the mask after the fork, the full agreement of the hidden tuples and the zero challenge are at most named constants. |
+| `RealTermBounds` (`SepChain`) | The real-experiment probabilities of the Schwartz–Zippel and batching events (without the prior events) are at most named constants; their bounds need the expansion as an oracle and the slope consistency across executions. |
+| `SimulatorTermBounds5` (`SeedTermDischarge`) | Earlier chain: the five simulator event probabilities are at most their named constants; its non-separation constant is not small. |
+| `InstanceHard` (`SepChain`; earlier form `InstanceHardness`) | Every budgeted adversary's solver returns a weight-`w` solution of the key generation's instance with probability at most `εSD` of the budget. |
 | `DistributionHard` (`DistributionalFinal`) | The same averaged over the instance distribution: used by the averaged form of the bound in place of `InstanceHard`. |
 
 **Parameter conditions.** Injectivity and fiber bounds of the signer's and the

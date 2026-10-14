@@ -3357,6 +3357,53 @@ The final statement's named hypotheses are now: the data-level closeness
 seed-collision bound, the layout's injectivity and fiber bounds with the
 size conditions, and the structural hypotheses.
 
+## Single-execution extraction (continuation 338)
+
+`SepChain.forgery_le_final_full_enc` is the composed forgery bound with
+the extraction redesigned to need the two branches' hidden tuples to
+differ at one execution rather than at every execution. The forking
+lemma's second branch answers the HashPiop query afresh, and the forger
+chooses its counter after seeing the answer; a forger that grinds the
+counter of its second-branch forgery makes the tuples agree at some
+execution at will, and even uniform tuples agree somewhere with
+probability about τ/2^κ. The old named constant `εSep` (the event
+`notSeparated`) was therefore not small for any model, and the old final
+statement was weak against such forgers. The new event `allAgree` (the
+tuples equal at every execution) has probability about 2^(−τκ) per pair of
+counters under uniform expansion.
+
+The new extraction: the first branch's candidate values are, by the
+definition of the slope coefficient `mCoef`, the extracted lines evaluated
+at the first branch's inverted challenge, so acceptance alone gives the
+vanishing of the difference polynomial. The content of the reduction moves
+into the Schwartz–Zippel event `szPlus` (a nonzero difference polynomial
+vanishing at the challenge, without the prior events): its bound needs the
+difference polynomial to be determined by the committed data, which is the
+slope consistency across executions (the mask check with a partial claim,
+one whose seed vector is known at the separated executions only) and the
+binding of the seed array. The shared slope game is stated for full claims;
+its generalization to partial claims is the next item, together with the
+challenge expansion as a counted oracle.
+
+Human review items: the hypotheses `hencode` (the verifier's challenge
+encoding equals the Gray-row psi map) and `hlayoutV` are no longer needed
+by the new chain and are dropped from the new final statements; the old
+chain and its final statements are kept unchanged. The constants `εSZ` and
+`εBatch` are now real-experiment probabilities of events that include the
+negations of the mask, agreement, seed-collision, trap, witnessed and
+unseen events.
+
+Survey finding on `DataClose` and `LeafHide` (not yet acted on): the
+signer's per-leaf PRG is the parameter `SignerSetting.p.prg`, never a
+`Program.cipher` request, so no ideal-cipher argument can reach it as
+stated; `PRGUniform` cannot hold when `s + wit + rnd > λ`; `DataClose`
+quantifies pointwise over every distinct family after the functional is
+fixed, and `LeafHide` over arbitrary continuations, so both appear
+satisfiable only with δ of order one. A provable form would route the PRG
+through the cipher, state both hypotheses as posterior means, and restrict
+the continuation to the adversary's own runs. Recorded as the design item
+after the slope-game generalization.
+
 ## The candidate encoding and the distributional bound (continuation 336)
 
 `CandidateSerialization.candidateSerialization` is a named reading of the

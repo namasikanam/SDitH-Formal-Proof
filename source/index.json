@@ -458,6 +458,8 @@
    "full_layout_final_proof": "SDitH/Proofs/FullLayoutFinal.lean",
       "candidate_serialization_proof": "SDitH/Proofs/CandidateSerialization.lean",
       "distributional_final_proof": "SDitH/Proofs/DistributionalFinal.lean",
+      "sep_events_proof": "SDitH/Proofs/SepEvents.lean",
+      "sep_chain_proof": "SDitH/Proofs/SepChain.lean",
    "oracle_trace_specification": "SDitH/Spec/RandomOracleTrace.lean",
    "oracle_trace_proof": "SDitH/Proofs/RandomOracleTrace.lean",
    "oracle_mention_specification": "SDitH/Spec/RandomOracleMention.lean",

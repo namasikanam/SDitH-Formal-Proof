@@ -2,7 +2,7 @@
 
 Last updated: 2026-10-15.
 
-The latest full validation passed **3,755 build jobs and audited 19,173 project
+The latest full validation passed **3,757 build jobs and audited 19,261 project
 declarations**. This checks the current development, not whole-scheme correctness
 or security. See [validation output](audit/validation.log).
 
@@ -41,12 +41,15 @@ percentage.
 
 ## Track A — the security reduction
 
-Status: complete modulo the named assumptions. Final statements
-`SeedTermDischarge.forgery_le_final_hard_C` (generic layouts),
-`CandidateSerialization.forgery_le_final_full_enc` (full layout, candidate
-encoding) and `DistributionalFinal.averaged_forgery_le_final` (averaged over
-an instance distribution); the per-term checklist is in "Explicit terms of
-the composed forgery bound" below.
+Status: complete modulo the named assumptions. Current final statement
+`SepChain.forgery_le_final_full_enc` (single-execution extraction, full
+layout, candidate encoding; generic form `SepChain.forgery_le_final_hard`).
+The earlier chain is kept: `SeedTermDischarge.forgery_le_final_hard_C`,
+`CandidateSerialization.forgery_le_final_full_enc` and
+`DistributionalFinal.averaged_forgery_le_final`; its non-separation constant
+`εSep` is not small for any model (continuation 338), so those statements
+are weak against counter-grinding forgers. The per-term checklist is in
+"Explicit terms of the composed forgery bound" below.
 
 - [x] Forgery-to-fork with useful-query selection and replay; extraction from
   two accepted transcripts; the witness-free solver; the hybrids over the
@@ -69,6 +72,25 @@ the composed forgery bound" below.
 - [x] Hardness as a named assumption: `InstanceHard` bounds every budgeted
   adversary's solver on the key generation's fixed instance by `εSD`, and
   the final statement carries `εSD` in place of the solver's success.
+- [x] Single-execution extraction (continuation 338): the extraction needs
+  the hidden tuples to differ at one execution; the bad event is their
+  full agreement (`SepEvents.allAgree`), negligible under uniform
+  expansion, in place of agreement at some execution, which a forger can
+  force by grinding its counter. The Schwartz–Zippel and batching events
+  carry the negations of the prior events and are named real-experiment
+  constants (`SepChain.RealTermBounds`); the transferred constants are
+  `SepChain.SimulatorTermBounds3`. Hypotheses `hencode` and `hlayoutV` are
+  no longer needed.
+- [ ] Bounds for `εSep`, `εZero`, `εR` (needs the challenge expansion as a
+  counted oracle); for `εSZ` and `εBatch` (needs in addition the slope
+  game generalized to partial claims, whose seed vector is known at the
+  separated executions only, and the binding of the difference polynomial
+  to the committed data).
+- [ ] `DataClose` and `LeafHide` as stated look satisfiable only with slack
+  near one (pointwise in the family; arbitrary continuations), and the
+  signer's PRG is a supplied function, not a cipher call: restate in
+  posterior-mean form with the adversary's own continuations, route the
+  PRG through the ideal cipher, then prove (survey of 2026-10-15).
 - [x] Hardness over a distribution: `DistributionalFinal` averages the bound
   over any distribution of instances under `DistributionHard` (mean-square
   form over any distribution; the averaged advantage on a finite index
